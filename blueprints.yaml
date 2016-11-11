@@ -1,0 +1,31 @@
+name: NewPageByForm
+version: 0.1.0
+description: Creates a new page upon form submission
+icon: plug
+author:
+  name: Ron Wardenier
+  email: bleutzinn@rwgc.nl
+homepage: https://github.com/ron-wardenier/grav-plugin-page-creator
+demo: 
+keywords: grav, plugin, page, form
+bugs: https://github.com/ron-wardenier/grav-plugin-newpagebyform/issues
+docs: https://github.com/ron-wardenier/grav-plugin-newpagebyform/blob/develop/README.md
+license: MIT
+
+form:
+  validation: strict
+  fields:
+    enabled:
+      type: toggle
+      label: Plugin status
+      highlight: 1
+      default: 0
+      options:
+        1: Enabled
+        0: Disabled
+      validate:
+        type: bool
+    route:
+      type: text
+      label: New Page Route
+      help: Sets the route or path of new pages
