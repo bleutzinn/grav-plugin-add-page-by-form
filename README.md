@@ -38,13 +38,13 @@ enabled: true
 
 ## Usage
 
-**Describe how to use the plugin.**
+To be amended
 
 ## Credits
 
-**Did you incorporate third-party code? Want to thank somebody?**
+To be amended
 
 ## To Do
 
-- [ ] Future plans, if any
+- Add code to create the page
 
