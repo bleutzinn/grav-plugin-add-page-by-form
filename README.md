@@ -2,7 +2,7 @@
 
 The **New Page By Form** Plugin is for [Grav CMS](http://github.com/getgrav/grav). It allows (anonymous) users to create a new page by filling in a form.
 
-**IMPORTANT: this version is far from ready. Do not use or forn unless you really need to**
+**IMPORTANT: this version is far from ready. Do not use or fork unless you really need to**
 
 ## Installation
 
