@@ -41,11 +41,15 @@ Here is the default configuration and an explanation of available options:
 
 ```yaml
 enabled: true
+route: '01.home/blog'
+template: 'page'
 ```
+route sets the file location for the new page.
+template specifies the Twig template to be used by the new page. This line will be added to the new page header (YAML Frontmatter).
 
 ## Usage
 
-Create a page with a form. Make sure the 'form.md' file look like:
+Create a page with a form. Make sure the 'form.md' file looks like:
 ```
 ---
 title: Create New Page
@@ -81,6 +85,7 @@ You can create a new page by filling in the form below.
 
 Please enter the Page Title and write some content to appear on the new page.
 ```
+Create the Twig template file 'page.md'
 
 ## Credits
 
