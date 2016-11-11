@@ -4,6 +4,13 @@ The **New Page By Form** Plugin is for [Grav CMS](http://github.com/getgrav/grav
 
 **IMPORTANT: this version is far from ready. Do not use or fork unless you really need to**
 
+## Security
+
+This plugin is being developed for a specific use case where an anonymous user is allowed to create a new page. The page is not visible by default but gets moderated by the Admin user. Upon approval the Admin adds the new page to the website by making the page visible.
+
+The above use case does not require any security and so, this plugin does not provide any security.
+Please take this in consideration before using this plugin, especially on the web.
+
 ## Installation
 
 Installing the New Page By Form plugin can be done in one of two ways. The GPM (Grav Package Manager) installation method enables you to quickly and easily install the plugin with a simple terminal command, while the manual method enables you to do so via a zip file.
