@@ -40,15 +40,18 @@ class NewPageByFormPlugin extends Plugin
         
 
         switch ($action) {
-            case 'save':
+            case 'createpage':
                 //do what you want
                 if(isset($_POST)) {  
                     $newPageRoute = $this->config->get('plugins.newpagebyform.route');
-                    $this->grav['debugger']->addMessage('New page route is (from config YAML): '.$newPageRoute);
+                    $this->grav['debugger']->addMessage('New page route is: '.$newPageRoute);
+                    $newPageTemplate = $this->config->get('plugins.newpagebyform.template');
+                    $this->grav['debugger']->addMessage('Template to be used is: '.$newPageTemplate);
 
                     // store all form fields in an array
                     $formdata = $form->value()->toArray();
-                    $this->grav['debugger']->addMessage('New page template (from hidden form field): '.$formdata['template']);
+                    $this->grav['debugger']->addMessage('Submitted Page Title: '.$formdata['title']);
+                    $this->grav['debugger']->addMessage('Submitted Page Content: '.$formdata['content']);
                 }
         }
     }

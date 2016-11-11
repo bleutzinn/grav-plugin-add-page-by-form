@@ -1,2 +1,3 @@
 enabled: true
-route: '/home/blog' 
+route: '/home/blog'
+template: 'page.md'
