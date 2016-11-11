@@ -5,7 +5,7 @@ icon: plug
 author:
   name: Ron Wardenier
   email: bleutzinn@rwgc.nl
-homepage: https://github.com/ron-wardenier/grav-plugin-page-creator
+homepage: https://github.com/bleutzinn/grav-plugin-newpagebyform
 demo: 
 keywords: grav, plugin, page, form
 bugs: https://github.com/ron-wardenier/grav-plugin-newpagebyform/issues
@@ -33,4 +33,3 @@ form:
       type: text
       label: Page Twig Template
       help: Sets the Twig template to be used
-      
