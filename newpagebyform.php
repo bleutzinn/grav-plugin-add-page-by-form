@@ -1,7 +1,10 @@
 <?php
 namespace Grav\Plugin;
 
+use Grav\Common\Grav;
 use Grav\Common\Plugin;
+use Grav\Common\Page\Page;
+use Grav\Common\Uri;
 use RocketTheme\Toolbox\Event\Event;
 
 /**
@@ -52,6 +55,42 @@ class NewPageByFormPlugin extends Plugin
                     $formdata = $form->value()->toArray();
                     $this->grav['debugger']->addMessage('Submitted Page Title: '.$formdata['title']);
                     $this->grav['debugger']->addMessage('Submitted Page Content: '.$formdata['content']);
+
+                    // Create s slug to be used as the page filename
+                    // Credits: Alex Garrett
+                    $slug = $formdata['title'];
+                    $lettersNumbersSpacesHyphens = '/[^\-\s\pN\pL]+/u';
+                    $spacesDuplicateHypens = '/[\-\s]+/';
+                    $slug = preg_replace($lettersNumbersSpacesHyphens, '', $slug);
+                    $slug = preg_replace($spacesDuplicateHypens, '-', $slug);
+                    $slug = trim($slug, '-');
+                    $slug = mb_strtolower($slug, 'UTF-8');
+                    $this->grav['debugger']->addMessage('Slug is: "'.$slug.'"');
+
+                    $newPageDir = PAGES_DIR . $newPageRoute . '/' . $slug;
+
+                    if (!file_exists($newPageDir)) {
+                        $this->grav['debugger']->addMessage('Yep create dir! '.$newPageDir);
+                        mkdir($newPageDir, 0777, true);
+                        $pageFile = fopen($newPageDir . '/default.md', "w") or die("Unable to open file!");
+                        $txt = "---\n";
+                        fwrite($pageFile, $txt);
+                        $txt = "title: " . $formdata['title'] . "\n";
+                        fwrite($pageFile, $txt);
+                        $txt = "template: " . $newPageTemplate . "\n";
+                        fwrite($pageFile, $txt);
+                        $txt = "visible: false\n";
+                        fwrite($pageFile, $txt);
+                        $txt = "---\n";
+                        fwrite($pageFile, $txt);
+                        $txt = $formdata['content'] . "\n";
+                        fwrite($pageFile, $txt);
+                        fclose($pageFile);
+                    }
+                    esle {
+                        $this->grav['debugger']->addMessage('Nope, dir "' . $newPageDir . '" already exists! ');
+                    }
+
                 }
         }
     }
@@ -66,27 +105,6 @@ class NewPageByFormPlugin extends Plugin
             return;
         }
 
-        // Enable the main event we are interested in
-        $this->enable([
-            'onPageContentRaw' => ['onPageContentRaw', 0]
-        ]);
     }
 
-    /**
-     * Do some work for this event, full details of events can be found
-     * on the learn site: http://learn.getgrav.org/plugins/event-hooks
-     *
-     * @param Event $e
-     */
-    public function onPageContentRaw(Event $e)
-    {
-        // Get a variable from the plugin configuration
-        $text = $this->grav['config']->get('plugins.newpagebyform.text_var');
-
-        // Get the current raw content
-        $content = $e['page']->getRawContent();
-
-        // Prepend the output with the custom text and set back on the page
-        $e['page']->setRawContent($text . "\n\n" . $content);
-    }
 }
