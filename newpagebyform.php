@@ -87,7 +87,7 @@ class NewPageByFormPlugin extends Plugin
                         fwrite($pageFile, $txt);
                         fclose($pageFile);
                     }
-                    esle {
+                    else {
                         $this->grav['debugger']->addMessage('Nope, dir "' . $newPageDir . '" already exists! ');
                     }
 
