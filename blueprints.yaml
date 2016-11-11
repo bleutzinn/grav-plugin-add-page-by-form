@@ -29,3 +29,8 @@ form:
       type: text
       label: New Page Route
       help: Sets the route or path of new pages
+    template:
+      type: text
+      label: Page Twig Template
+      help: Sets the Twig template to be used
+      
