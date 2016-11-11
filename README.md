@@ -1,12 +1,12 @@
-# Page Creator Plugin
+# New Page By Form Plugin
 
-**This README.md file should be modified to describe the features, installation, configuration, and general usage of this plugin.**
+The **New Page By Form** Plugin is for [Grav CMS](http://github.com/getgrav/grav). It allows (anonymous) users to create a new page by filling in a form.
 
-The **Page Creator** Plugin is for [Grav CMS](http://github.com/getgrav/grav). Creates a new page submitted by a form
+**IMPORTANT: this version is far from ready. Do not use or forn unless you really need to**
 
 ## Installation
 
-Installing the Page Creator plugin can be done in one of two ways. The GPM (Grav Package Manager) installation method enables you to quickly and easily install the plugin with a simple terminal command, while the manual method enables you to do so via a zip file.
+Installing the New Page By Form plugin can be done in one of two ways. The GPM (Grav Package Manager) installation method enables you to quickly and easily install the plugin with a simple terminal command, while the manual method enables you to do so via a zip file.
 
 ### GPM Installation (Preferred)
 
