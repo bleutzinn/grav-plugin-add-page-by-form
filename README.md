@@ -52,10 +52,6 @@ title: Create New Page
 form:
     name: new-page-form
     fields:
-        - name: template
-          type: hidden
-          default: page.md
-
         - name: title
           label: Page Title
           placeholder: 
@@ -78,11 +74,7 @@ form:
           classes:
 
     process:
-        - save:
-            fileprefix: feedback-
-            dateformat: Ymd-His-u
-            extension: txt
-            body: "{% include 'forms/data.txt.twig' %}"
+        - createpage:
         - display: thankyou
 ---
 You can create a new page by filling in the form below.
@@ -92,9 +84,10 @@ Please enter the Page Title and write some content to appear on the new page.
 
 ## Credits
 
-To be amended
+To be amended.
 
 ## To Do
 
-- Add code to create the page
+- Proper handling of Page already exists situation
+- Error handling
 
