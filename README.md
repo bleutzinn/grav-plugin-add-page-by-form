@@ -2,20 +2,20 @@
 
 The **Add Page By Form** Plugin is for [Grav CMS](http://github.com/getgrav/grav). It allows (anonymous) users to add a page by filling in a form.
 
-**IMPORTANT: this version is far from ready. Do not use or fork unless you really need to**
+**IMPORTANT: this version is far from ready. Do not use or fork unless you really need to.**
 
 ## Security
 
-This plugin is being developed for a specific use case where an anonymous user is allowed to add a page. The page is not visible in the menu by default but gets moderated by the Admin user. Upon approval the Admin sets 'published: true' so the page will be included in the menu.
+This plugin is being developed for a specific use case where an anonymous user is allowed to add a page to a Grav website. The page is not visible in the menu by default but gets moderated by the Admin user. Upon approval the Admin sets 'published: true' so the page will be included in the menu.
 
 The above use case does not require any security and so, this plugin does not provide any security measures.
 Please take this in consideration before using this plugin.
 
 ## Installation
 
-Installing the ADD Page By Form plugin can be done in one of two ways. The GPM (Grav Package Manager) installation method enables you to quickly and easily install the plugin with a simple terminal command, while the manual method enables you to do so via a zip file.
+Installing the Add Page By Form plugin can be done in one of two ways. The GPM (Grav Package Manager) installation method enables you to quickly and easily install the plugin with a simple terminal command, while the manual method enables you to do so via a zip file.
 
-### GPM Installation (Preferred)
+### GPM Installation (Preferred) (not implemented yet)
 
 The simplest way to install this plugin is via the [Grav Package Manager (GPM)](http://learn.getgrav.org/advanced/grav-gpm) through your system's terminal (also called the command line).  From the root of your Grav install type:
 
@@ -52,9 +52,9 @@ template specifies the Twig template to be used by the new page. This line will 
 Create a page with a form. Make sure the 'form.md' file looks like:
 ```
 ---
-title: Create New Page
+title: Add Page
 form:
-    name: new-page-form
+    name: add-page-form
     fields:
         - name: title
           label: Page Title
@@ -85,6 +85,8 @@ You can add a page by filling in the form below.
 
 Please enter the Page Title and write your content to appear on the page.
 ```
+The form fields 'title' and 'content' are mandatory as the plugin will use the entered values to add the page to Grav.
+
 Create the required Twig template file in the 'templates' folder of your theme. The template file name must match the name as set in the configuration file. So when in your configuration you have: 'template: page' then the template file name must be: 'page.html.twig'.
 
 ## Credits
