@@ -8,8 +8,8 @@ author:
 homepage: https://github.com/bleutzinn/grav-plugin-add-page-by-form
 demo: 
 keywords: grav, plugin, page, form
-bugs: https://github.com/ron-wardenier/grav-plugin-add-page-by-form/issues
-docs: https://github.com/ron-wardenier/grav-plugin-add-page-by-form/blob/develop/README.md
+bugs: https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues
+docs: https://github.com/bleutzinn/grav-plugin-add-page-by-form/blob/develop/README.md
 license: MIT
 
 form:

@@ -8,10 +8,10 @@ use Grav\Common\Uri;
 use RocketTheme\Toolbox\Event\Event;
 
 /**
- * Class NewPageByFormPlugin
+ * Class AddPageByFormPlugin
  * @package Grav\Plugin
  */
-class NewPageByFormPlugin extends Plugin
+class AddPageByFormPlugin extends Plugin
 {
     /**
      * @return array
