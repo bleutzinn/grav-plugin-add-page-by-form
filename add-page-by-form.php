@@ -37,24 +37,17 @@ class AddPageByFormPlugin extends Plugin
         $form = $event['form'];
         $action = $event['action'];
         $params = $event['params'];
-
     
-        $this->grav['debugger']->addMessage('Form submit action is: '.$action);
-        
-
         switch ($action) {
-            case 'createpage':
+            case 'addpage':
                 //do what you want
                 if(isset($_POST)) {  
-                    $newPageRoute = $this->config->get('plugins.newpagebyform.route');
-                    $this->grav['debugger']->addMessage('New page route is: '.$newPageRoute);
-                    $newPageTemplate = $this->config->get('plugins.newpagebyform.template');
-                    $this->grav['debugger']->addMessage('Template to be used is: '.$newPageTemplate);
-
+                    $newPageRoute = $this->config->get('plugins.add-page-by-form.route');
+                    $newPageTemplate = $this->config->get('plugins.add-page-by-form.template');
+                    $dateFormat = $this->config->get('plugins.add-page-by-form.dateformat');
+                    
                     // store all form fields in an array
                     $formdata = $form->value()->toArray();
-                    $this->grav['debugger']->addMessage('Submitted Page Title: '.$formdata['title']);
-                    $this->grav['debugger']->addMessage('Submitted Page Content: '.$formdata['content']);
 
                     // Create s slug to be used as the page filename
                     // Credits: Alex Garrett
@@ -65,32 +58,58 @@ class AddPageByFormPlugin extends Plugin
                     $slug = preg_replace($spacesDuplicateHypens, '-', $slug);
                     $slug = trim($slug, '-');
                     $slug = mb_strtolower($slug, 'UTF-8');
-                    $this->grav['debugger']->addMessage('Slug is: "'.$slug.'"');
 
-                    $newPageDir = PAGES_DIR . $newPageRoute . '/' . $slug;
+                    // Assume this is the first submission of the page, so set $version to 1
+                    $version = 1;
+                    $newPageDir = PAGES_DIR . $newPageRoute . '/' . $slug . '_' . $version;
 
-                    if (!file_exists($newPageDir)) {
-                        $this->grav['debugger']->addMessage('Yep create dir! '.$newPageDir);
-                        mkdir($newPageDir, 0777, true);
-                        $pageFile = fopen($newPageDir . '/default.md', "w") or die("Unable to open file!");
+                    // Keep incrementing the page slug suffix to keep previous versions
+                    while (file_exists($newPageDir)) {
+                        $version += 1;
+                        $newPageDir = PAGES_DIR . $newPageRoute . '/' . $slug . '_' . $version;
+                    }
+
+                    // Add the page
+                    try {
+                        // Create the directory
+                        $pageDir = mkdir($newPageDir, 0775, true);
+                        if (!$pageDir) {
+                            throw new \Exception('Unable to add page; can not create directory "' . $newPageDir . '"');
+                        }
+                        // Create the page file
+                        $pageFile = fopen($newPageDir . '/default.md', "w");
+                        // test case $pageFile = false;
+                        if (!$pageFile) {
+                            throw new \Exception('Unable to add page; can not create file "default.md"');
+                        }
+                        // Include the page frontmatter
                         $txt = "---\n";
                         fwrite($pageFile, $txt);
                         $txt = "title: " . $formdata['title'] . "\n";
                         fwrite($pageFile, $txt);
                         $txt = "template: " . $newPageTemplate . "\n";
                         fwrite($pageFile, $txt);
-                        $txt = "visible: false\n";
+                        $txt = "published: false\n";
+                        fwrite($pageFile, $txt);
+                        $txt = "date: " . date($dateFormat) . "\n";
                         fwrite($pageFile, $txt);
                         $txt = "---\n";
                         fwrite($pageFile, $txt);
+                        // Include the page content
                         $txt = $formdata['content'] . "\n";
                         fwrite($pageFile, $txt);
+                        // Close and save the file
                         fclose($pageFile);
                     }
-                    else {
-                        $this->grav['debugger']->addMessage('Nope, dir "' . $newPageDir . '" already exists! ');
+                    catch (\Exception $e) {
+                        $this->grav['debugger']->addMessage($e->getMessage());
+                        $this->grav->fireEvent('onFormValidationError', new Event([
+                            'form'    => $form,
+                            'message' => '<strong>ERROR:</strong> ' . $e->getMessage() ]));
+                        $event->stopPropagation();
+                        return;
                     }
-
+    
                 }
         }
     }
