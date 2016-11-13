@@ -91,10 +91,9 @@ Create the required Twig template file in the 'templates' folder of your theme. 
 
 ## Credits
 
-To be amended.
+[Slug generator by Alex Garret](http://codereview.stackexchange.com/questions/44335/slug-url-generator) and of course to everyone who contibutes to Grav.
 
 ## To Do
 
-- Proper handling of Page already exists situation
-- Error handling
+- Improve feedback when an error occurs during page creation.
 
