@@ -56,7 +56,14 @@ title: Add Page
 form:
     name: add-page-form
     fields:
-        - name: title
+         - name: author
+          label: 'Author'
+          placeholder: Identify yourself
+          autocomplete: true
+          type: text
+          validate:
+              required: true
+       - name: title
           label: Page Title
           placeholder: 
           autocomplete: on
@@ -85,9 +92,18 @@ You can add a page by filling in the form below.
 
 Please enter the Page Title and write your content to appear on the page.
 ```
-The form fields 'title' and 'content' are mandatory as the plugin will use the entered values to add the page to Grav.
+The form fields 'author', title' and 'content' are mandatory as the plugin will use the entered values to add the page to Grav.
+Optionally there can be a section named 'params' like:
+```
+params:
+    published: false
+    instructor:
+        name: 'John Doe'
+        title: 'dr.'
+```
+When this section is present it's content will be inserted in the new page's frontmatter.
 
-Create the required Twig template file in the 'templates' folder of your theme. The template file name must match the name as set in the configuration file. So when in your configuration you have: 'template: page' then the template file name must be: 'page.html.twig'.
+Finally, create the required Twig template file in the 'templates' folder of your theme. The template file name must match the name as set in the configuration file. So when in your configuration you have: 'template: page' then the template file name must be: 'page.html.twig'.
 
 ## Credits
 
