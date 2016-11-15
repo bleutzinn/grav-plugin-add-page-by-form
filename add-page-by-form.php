@@ -41,17 +41,34 @@ class AddPageByFormPlugin extends Plugin
         switch ($action) {
             case 'addpage':
                 //do what you want
-                if(isset($_POST)) {  
+                if(isset($_POST)) {
+                    // Get plugin config settings
                     $newPageRoute = $this->config->get('plugins.add-page-by-form.route');
                     $newPageTemplate = $this->config->get('plugins.add-page-by-form.template');
                     $dateFormat = $this->config->get('plugins.add-page-by-form.dateformat');
+
+                    // Get the entire params block from the form page frontmatter
+                    $page = $this->grav['page'];
+                    $header = $page->header();
+                    $yaml_str = '';
+                    if ( isset($header->params) && is_array($header->params) ) {
+                        $yaml_str = yaml_emit($header->params);
+                        // Remove YAML wrapper
+                        $yaml_str = substr( $yaml_str, strpos($yaml_str, "\n")+1 );
+                        $yaml_str = str_replace( "\r\n", "\n", $yaml_str );
+                        $yaml_str = substr( $yaml_str, 0, strrpos(rtrim($yaml_str), "\n")+1 );
+                        $this->grav['debugger']->addMessage('The frontmatter \'params\' block is: ' . $yaml_str );
+                    }
                     
-                    // store all form fields in an array
+                    // Get all form fields
                     $formdata = $form->value()->toArray();
+                    $author = $formdata['author'];
+                    $title = $formdata['title'];
+                    $content = $formdata['content'];
 
                     // Create s slug to be used as the page filename
                     // Credits: Alex Garrett
-                    $slug = $formdata['title'];
+                    $slug = $title;
                     $lettersNumbersSpacesHyphens = '/[^\-\s\pN\pL]+/u';
                     $spacesDuplicateHypens = '/[\-\s]+/';
                     $slug = preg_replace($lettersNumbersSpacesHyphens, '', $slug);
@@ -85,19 +102,25 @@ class AddPageByFormPlugin extends Plugin
                         // Include the page frontmatter
                         $txt = "---\n";
                         fwrite($pageFile, $txt);
-                        $txt = "title: " . $formdata['title'] . "\n";
+                        $txt = "title: " . $title . "\n";
+                        fwrite($pageFile, $txt);
+                        $txt = "author: " . $author . "\n";
                         fwrite($pageFile, $txt);
                         $txt = "template: " . $newPageTemplate . "\n";
                         fwrite($pageFile, $txt);
-                        $txt = "published: false\n";
-                        fwrite($pageFile, $txt);
                         $txt = "date: " . date($dateFormat) . "\n";
                         fwrite($pageFile, $txt);
+                        if ($yaml_str != '') {
+                            $txt = $yaml_str;
+                            fwrite($pageFile, $txt);
+                        }
                         $txt = "---\n";
                         fwrite($pageFile, $txt);
+
                         // Include the page content
-                        $txt = $formdata['content'] . "\n";
+                        $txt = $content . "\n";
                         fwrite($pageFile, $txt);
+
                         // Close and save the file
                         fclose($pageFile);
                     }
