@@ -39,69 +39,82 @@ Here is the default configuration and an explanation of available options:
 
 ```yaml
 enabled: true
-route: '01.home/blog'
-template: 'page'
+dateformat: 'd-m-Y g:ia'
 ```
-route sets the file location for the new page.
-template specifies the Twig template to be used by the new page. This line will be added to the new page header (YAML Frontmatter).
+- 'enabled' determines whether the plugin is active
+- 'dateformat' sets how the date time should be displayed
 
 ## Usage
 
 Create a page with a form. Make sure the 'form.md' file looks like:
 ```
 ---
-title: Add Page
-form:
-    name: add-page-form
-    fields:
-         - name: author
-          label: 'Author'
-          placeholder: Identify yourself
-          autocomplete: true
-          type: text
-          validate:
-              required: true
-       - name: title
-          label: Page Title
-          placeholder: 
-          autocomplete: on
-          type: text
-          validate:
-            required: true
-
-        - name: content
-          label: Page Content
-          size: long
-          placeholder: 
-          type: textarea
-          validate:
-            required: true
-
-    buttons:
-        - type: submit
-          value: Submit
-          classes:
-
-    process:
-        - addpage:
-        - display: thankyou
----
-You can add a page by filling in the form below.
-
-Please enter the Page Title and write your content to appear on the page.
-```
-The form fields 'author', title' and 'content' are mandatory as the plugin will use the entered values to add the page to Grav.
-Optionally there can be a section named 'params' like:
-```
-params:
-    published: false
+title: 'Create New Page'
+route: '01.home/blog'
+pagefrontmatter:
+    title: 'Fallback title'
+    content: 'Fallback content'
+    template: item
+    published: true
     instructor:
         name: 'John Doe'
         title: 'dr.'
+form:
+    name: new-page-form
+    fields:
+        -
+            name: author
+            label: 'Author'
+            placeholder: Identify yourself as requested by your Instructor
+            autocomplete: true
+            type: text
+            validate:
+                required: true
+        -
+            name: title
+            label: 'Page Title'
+            placeholder: null
+            autocomplete: true
+            type: text
+            validate:
+                required: true
+        -
+            name: content
+            label: 'Page Content'
+            size: long
+            placeholder: null
+            type: textarea
+            validate:
+                required: true
+        -
+            type: spacer
+            text: This text is displayed between the Content field and the Submit button
+    buttons:
+        -
+            type: submit
+            value: Submit
+            classes: null
+    process:
+        -
+            addpage: null
+        -
+            display: thankyou
+---
+
+You can create a new page by filling in the form below.
+
+Please enter the Page Title and write some content to appear on the new page.
 ```
-When this section is present it's content will be inserted in the new page's frontmatter.
+
+
+route sets the file location for the new page.
+template specifies the Twig template to be used by the new page. This line will be added to the new page header (YAML Frontmatter).
+
+Everything inside the pagefrontmatter block, except for 'content', will be inserted in the new page's frontmatter.
+This makes it easy to use any value in a Twig template e.g. {{ page.header.author }}.
 
 Finally, create the required Twig template file in the 'templates' folder of your theme. The template file name must match the name as set in the configuration file. So when in your configuration you have: 'template: page' then the template file name must be: 'page.html.twig'.
+To create a blog post type page, simply set 'template: item' (and possibly 'published: true').
 
 ## Credits
 
@@ -110,4 +123,5 @@ Finally, create the required Twig template file in the 'templates' folder of you
 ## To Do
 
 - Improve feedback when an error occurs during page creation.
+- Explain the usage better.
 

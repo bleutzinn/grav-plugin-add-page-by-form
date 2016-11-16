@@ -1,10 +1,15 @@
+# v1.1.0
+##  11/16/2016
+
+1. [](#new)
+    * Settings in the pagefrontmatter block in the form page frontmatter now are merged with values from form fields. Form field values ovverride the pagefrontmatter settings.
+
 # v1.0.0
 ##  11/15/2016
 
 1. [](#new)
     * Added an extra form field: 'author'
     * Added copying an (optional) frontmatter block from the form page frontmatter to the newly added page's frontmatter
-
 
 # v0.2.0
 ##  11/13/2016
