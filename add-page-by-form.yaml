@@ -1,4 +1,2 @@
 enabled: true
-route: '01.home/blog'
-template: 'page'
 dateformat: 'd-m-Y g:ia'
