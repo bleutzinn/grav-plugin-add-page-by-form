@@ -43,32 +43,51 @@ class AddPageByFormPlugin extends Plugin
                 //do what you want
                 if(isset($_POST)) {
                     // Get plugin config settings
-                    $newPageRoute = $this->config->get('plugins.add-page-by-form.route');
-                    $newPageTemplate = $this->config->get('plugins.add-page-by-form.template');
+                    //$newPageRoute = $this->config->get('plugins.add-page-by-form.route');
+                    //$newPageTemplate = $this->config->get('plugins.add-page-by-form.template');
                     $dateFormat = $this->config->get('plugins.add-page-by-form.dateformat');
 
-                    // Get the entire params block from the form page frontmatter
+                    // Get all form fields
+                    $formdata = $form->value()->toArray();
+                    // Extract the content; if not present as a form value then fallback to frontmatter
+                    $content = 'No content set';
+                    if (isset($formdata['content']) ) {
+                        $content = $formdata['content'];
+                    }
+                    else {
+                        if (isset($header->pagefrontmatter->content) ) {
+                            $content = $header->pagefrontmatter->content;
+                        }
+                    }
+
+                    $this->grav['debugger']->addMessage('Content: ' . $content );
+
+                    // Assemble the new page frontmatter from the pagefrontmatter block as set in
+                    // the form page and the form field values. Field values override values set
+                    // in the pagefrontmatter block
                     $page = $this->grav['page'];
                     $header = $page->header();
                     $yaml_str = '';
-                    if ( isset($header->params) && is_array($header->params) ) {
-                        $yaml_str = yaml_emit($header->params);
-                        // Remove YAML wrapper
+                    if ( isset($header->pagefrontmatter) && is_array($header->pagefrontmatter) ) {
+                        $pagefrontmatter = $header->pagefrontmatter;
+                        $formdata = $form->value()->toArray();
+                        if (isset($formdata)) {
+                            $pagefrontmatter = array_merge($pagefrontmatter, $form->value()->toArray());
+                        }
+                        // Remove content from array
+                        unset($pagefrontmatter['content']);
+                        // Convert array to a YAML formatted string
+                        $yaml_str = yaml_emit($pagefrontmatter);
+                        // Remove YAML wrapper (--- ...)
                         $yaml_str = substr( $yaml_str, strpos($yaml_str, "\n")+1 );
                         $yaml_str = str_replace( "\r\n", "\n", $yaml_str );
                         $yaml_str = substr( $yaml_str, 0, strrpos(rtrim($yaml_str), "\n")+1 );
-                        $this->grav['debugger']->addMessage('The frontmatter \'params\' block is: ' . $yaml_str );
+                        $this->grav['debugger']->addMessage('The \'pagefrontmatter\' block is: ' . $yaml_str );
                     }
-                    
-                    // Get all form fields
-                    $formdata = $form->value()->toArray();
-                    $author = $formdata['author'];
-                    $title = $formdata['title'];
-                    $content = $formdata['content'];
 
                     // Create s slug to be used as the page filename
                     // Credits: Alex Garrett
-                    $slug = $title;
+                    $slug = $pagefrontmatter['title'];
                     $lettersNumbersSpacesHyphens = '/[^\-\s\pN\pL]+/u';
                     $spacesDuplicateHypens = '/[\-\s]+/';
                     $slug = preg_replace($lettersNumbersSpacesHyphens, '', $slug);
@@ -76,6 +95,7 @@ class AddPageByFormPlugin extends Plugin
                     $slug = trim($slug, '-');
                     $slug = mb_strtolower($slug, 'UTF-8');
 
+                    $newPageRoute = $header->route;
                     // Assume this is the first submission of the page, so set $version to 1
                     $version = 1;
                     $newPageDir = PAGES_DIR . $newPageRoute . '/' . $slug . '_' . $version;
@@ -102,14 +122,10 @@ class AddPageByFormPlugin extends Plugin
                         // Include the page frontmatter
                         $txt = "---\n";
                         fwrite($pageFile, $txt);
-                        $txt = "title: " . $title . "\n";
-                        fwrite($pageFile, $txt);
-                        $txt = "author: " . $author . "\n";
-                        fwrite($pageFile, $txt);
-                        $txt = "template: " . $newPageTemplate . "\n";
-                        fwrite($pageFile, $txt);
+                        // Insert the timestamp
                         $txt = "date: " . date($dateFormat) . "\n";
                         fwrite($pageFile, $txt);
+                        // Insert all frontmatter
                         if ($yaml_str != '') {
                             $txt = $yaml_str;
                             fwrite($pageFile, $txt);
