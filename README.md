@@ -107,8 +107,8 @@ Please enter the Page Title and write some content to appear on the new page.
 ```
 
 
-route sets the file location for the new page.
-template specifies the Twig template to be used by the new page. This line will be added to the new page header (YAML Frontmatter).
+- route sets the file location for the new page.
+- template specifies the Twig template to be used by the new page.
 
 Everything inside the pagefrontmatter block, except for 'content', will be inserted in the new page's frontmatter.
 This makes it easy to use any value in a Twig template e.g. {{ page.header.author }}.
