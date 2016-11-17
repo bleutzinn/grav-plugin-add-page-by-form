@@ -7,6 +7,8 @@ use Grav\Common\Page\Page;
 use Grav\Common\Uri;
 use RocketTheme\Toolbox\Event\Event;
 
+require_once "vendor/spyc.php";
+
 /**
  * Class AddPageByFormPlugin
  * @package Grav\Plugin
@@ -77,11 +79,8 @@ class AddPageByFormPlugin extends Plugin
                         // Remove content from array
                         unset($pagefrontmatter['content']);
                         // Convert array to a YAML formatted string
-                        $yaml_str = yaml_emit($pagefrontmatter);
-                        // Remove YAML wrapper (--- ...)
-                        $yaml_str = substr( $yaml_str, strpos($yaml_str, "\n")+1 );
-                        $yaml_str = str_replace( "\r\n", "\n", $yaml_str );
-                        $yaml_str = substr( $yaml_str, 0, strrpos(rtrim($yaml_str), "\n")+1 );
+                        $yaml_str = spyc_dump($pagefrontmatter);
+                        dump($yaml_str);
                         $this->grav['debugger']->addMessage('The \'pagefrontmatter\' block is: ' . $yaml_str );
                     }
 
