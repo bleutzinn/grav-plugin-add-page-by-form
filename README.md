@@ -4,10 +4,7 @@ The **Add Page By Form** Plugin is for [Grav CMS](http://github.com/getgrav/grav
 
 ## Security
 
-This plugin is being developed for a specific use case where an anonymous user is allowed to add a page to a Grav website. The page is not visible in the menu by default but gets moderated by the Admin user. Upon approval the Admin sets 'published: true' so the page will be included in the menu.
-
-The above use case does not require any security and so, this plugin does not provide any security measures.
-Please take this in consideration before using this plugin.
+This plugin does not provide any security measures. Please take this in consideration before using this plugin.
 
 ## Installation
 
@@ -46,7 +43,9 @@ dateformat: 'd-m-Y g:ia'
 
 ## Usage
 
-Create a page with a form. Make sure the 'form.md' file looks like:
+Most configuration is set in the page which displays the 'Add page' form to the user. In the example page below the content of the 'pagefrontmatter' block must be seen as default settings for the new page. By defining form fields with the same name you can have the user override the default values by input via the form.  
+
+The first step is to create the page with the form. Make sure the form page looks like:
 ```
 ---
 title: 'Create New Page'
@@ -106,12 +105,15 @@ You can create a new page by filling in the form below.
 Please enter the Page Title and write some content to appear on the new page.
 ```
 
+The most important settings are:
 
-- route sets the file location for the new page.
-- template specifies the Twig template to be used by the new page.
+- 'route' sets the file location for the new page.
+- 'template' specifies the Twig template to be used by the new page.
+- 'pagefrontmatter' is a block of frontmatter that gets inserted in the new page header.
 
-Everything inside the pagefrontmatter block, except for 'content', will be inserted in the new page's frontmatter.
-This makes it easy to use any value in a Twig template e.g. {{ page.header.author }}.
+Values set in the 'pagefrontmatter' block can be overriden by user input if you add a field by the same name in the form.
+
+Since both 'presets' via the 'pagefrontmatter' block and user input are added to the new page frontmatter it is easy to use any of these values in a Twig template e.g. {{ page.header.author }}.
 
 Finally, create the required Twig template file in the 'templates' folder of your theme. The template file name must match the name as set in the configuration file. So when in your configuration you have: 'template: page' then the template file name must be: 'page.html.twig'.
 To create a blog post type page, simply set 'template: item' (and possibly 'published: true').
