@@ -1,3 +1,9 @@
+# v1.1.1
+##  11/17/2016
+
+1. [](#improved)
+    * Removed dependency of PECL YAML function yaml_emit() in favor of using vendor/spyc.php class.
+
 # v1.1.0
 ##  11/16/2016
 
