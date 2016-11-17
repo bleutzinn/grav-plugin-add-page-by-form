@@ -80,7 +80,7 @@ class AddPageByFormPlugin extends Plugin
                         unset($pagefrontmatter['content']);
                         // Convert array to a YAML formatted string
                         $yaml_str = spyc_dump($pagefrontmatter);
-                        dump($yaml_str);
+                        //dump($yaml_str);
                         $this->grav['debugger']->addMessage('The \'pagefrontmatter\' block is: ' . $yaml_str );
                     }
 
