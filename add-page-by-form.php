@@ -96,8 +96,8 @@ class AddPageByFormPlugin extends Plugin
 
                     $newPageRoute = $header->route;
                     // Assume this is the first submission of the page, so set $version to 1
-                    $version = 1;
-                    $newPageDir = PAGES_DIR . $newPageRoute . '/' . $slug . '_' . $version;
+                    $version = 0;
+                    $newPageDir = PAGES_DIR . $newPageRoute . '/' . $slug;
 
                     // Keep incrementing the page slug suffix to keep previous versions
                     while (file_exists($newPageDir)) {
