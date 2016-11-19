@@ -1,15 +1,15 @@
-name: NewPageByForm
+name: Add Page By Form
 version: 0.1.0
-description: Creates a new page upon form submission
-icon: plug
+description: Adds a page upon form submission
+icon: plus-square-o
 author:
   name: Ron Wardenier
   email: bleutzinn@rwgc.nl
-homepage: https://github.com/ron-wardenier/grav-plugin-page-creator
+homepage: https://github.com/bleutzinn/grav-plugin-add-page-by-form
 demo: 
 keywords: grav, plugin, page, form
-bugs: https://github.com/ron-wardenier/grav-plugin-newpagebyform/issues
-docs: https://github.com/ron-wardenier/grav-plugin-newpagebyform/blob/develop/README.md
+bugs: https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues
+docs: https://github.com/bleutzinn/grav-plugin-add-page-by-form/blob/dev/README.md
 license: MIT
 
 form:
@@ -29,3 +29,7 @@ form:
       type: text
       label: New Page Route
       help: Sets the route or path of new pages
+    template:
+      type: text
+      label: Page Twig Template
+      help: Sets the Twig template to be used
