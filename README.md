@@ -45,34 +45,28 @@ dateformat: 'd-m-Y g:ia'
 
 Most configuration is set in the page which displays the 'Add page' form to the user. In the example page below the content of the 'pagefrontmatter' block must be seen as default settings for the new page. By defining form fields with the same name you can have the user override the default values by input via the form.  
 
-The first step is to create the page with the form. Make sure the form page looks like:
+The first step is to create the page with the form.
+
+To add a page use this example as a starting point:
 ```
 ---
-title: 'Create New Page'
-route: '01.home/blog'
+title: 'Add New Page'
+route: '/'
 pagefrontmatter:
-    title: 'Fallback title'
-    content: 'Fallback content'
-    template: item
-    published: true
+    title: 'Default Page Title'
+    content: 'Default Page Content'
+    template: page
+    visible: true
     instructor:
         name: 'John Doe'
         title: 'dr.'
 form:
-    name: new-page-form
+    name: add-page-form
     fields:
-        -
-            name: author
-            label: 'Author'
-            placeholder: Identify yourself as requested by your Instructor
-            autocomplete: true
-            type: text
-            validate:
-                required: true
         -
             name: title
             label: 'Page Title'
-            placeholder: null
+            placeholder: 'Enter your page title here'
             autocomplete: true
             type: text
             validate:
@@ -81,13 +75,10 @@ form:
             name: content
             label: 'Page Content'
             size: long
-            placeholder: null
+            placeholder: 'Write the content here'
             type: textarea
             validate:
                 required: true
-        -
-            type: spacer
-            text: This text is displayed between the Content field and the Submit button
     buttons:
         -
             type: submit
@@ -100,23 +91,81 @@ form:
             display: thankyou
 ---
 
-You can create a new page by filling in the form below.
+You can add a new page by filling in the form below.
 
-Please enter the Page Title and write some content to appear on the new page.
+Please enter the a title and write some content to appear on the new page.
+```
+
+To allow a user to add a blog post simply change the template to 'item':
+
+```
+---
+title: 'Add Blog Post'
+route: '01.blog'
+pagefrontmatter:
+    author: 'Default Author Name'
+    title: 'Default Post Title'
+    content: 'Default Post Content'
+    template: item
+    instructor:
+        name: 'John Doe'
+        title: 'dr.'
+form:
+    name: add-blog-post-form
+    fields:
+        -
+            name: author
+            label: 'Author'
+            placeholder: 'Enter your name here'
+            autocomplete: true
+            type: text
+            validate:
+                required: true
+        -
+            name: title
+            label: 'Blog Post Title'
+            placeholder: 'Enter your page title here'
+            autocomplete: true
+            type: text
+            validate:
+                required: true
+        -
+            name: content
+            label: 'Page Content'
+            size: long
+            placeholder: 'Write the content here'
+            type: textarea
+            validate:
+                required: true
+    buttons:
+        -
+            type: submit
+            value: Submit
+            classes: null
+    process:
+        -
+            addpage: null
+        -
+            display: thankyou
+---
+
+You can add a new blog post by filling in the form below.
+
+Please enter your name, a title and write something nice.
 ```
 
 The most important settings are:
 
 - 'route' sets the file location for the new page.
-- 'template' specifies the Twig template to be used by the new page.
+- 'template' specifies the Twig template to be used by the new page. Use 'page' for a regular page and 'item' for a blog post item.
 - 'pagefrontmatter' is a block of frontmatter that gets inserted in the new page header.
 
 Values set in the 'pagefrontmatter' block can be overriden by user input if you add a field by the same name in the form.
 
 Since both 'presets' via the 'pagefrontmatter' block and user input are added to the new page frontmatter it is easy to use any of these values in a Twig template e.g. {{ page.header.author }}.
 
-Finally, create the required Twig template file in the 'templates' folder of your theme. The template file name must match the name as set in the configuration file. So when in your configuration you have: 'template: page' then the template file name must be: 'page.html.twig'.
-To create a blog post type page, simply set 'template: item' (and possibly 'published: true').
+Finally, create a 'thankyou' page as a child page of the form page.
+
 
 ## Credits
 
@@ -125,5 +174,4 @@ To create a blog post type page, simply set 'template: item' (and possibly 'publ
 ## To Do
 
 - Improve feedback when an error occurs during page creation.
-- Explain the usage better.
 
