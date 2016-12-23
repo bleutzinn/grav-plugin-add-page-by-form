@@ -1,6 +1,6 @@
 # Add Page By Form Plugin
 
-The **Add Page By Form** Plugin is for [Grav CMS](http://github.com/getgrav/grav). It allows (anonymous) users to add a page by filling in a form.
+The **Add Page By Form** Plugin is for [Grav CMS](http://github.com/getgrav/grav). It allows users to add a new page by filling in a form. A new page can also be a new blog post by setting the appropriate template.
 
 ## Test release
 
@@ -38,7 +38,8 @@ Before configuring this plugin, you should copy the `user/plugins/add-page-by-fo
 
 Here is the default configuration and an explanation of available options:
 
-```yaml
+```
+yaml
 enabled: true
 dateformat: 'd-m-Y g:ia'
 ```
@@ -55,7 +56,7 @@ To add a page use this example as a starting point:
 ```
 ---
 title: 'Add New Page'
-route: '/'
+parent: '/'
 pagefrontmatter:
     title: 'Default Page Title'
     content: 'Default Page Content'
@@ -105,7 +106,7 @@ To allow a user to add a blog post simply change the template to 'item':
 ```
 ---
 title: 'Add Blog Post'
-route: '01.blog'
+parent: '/blog'
 pagefrontmatter:
     author: 'Default Author Name'
     title: 'Default Post Title'
@@ -160,7 +161,7 @@ Please enter your name, a title and write something nice.
 
 The most important settings are:
 
-- 'route' sets the file location for the new page.
+- 'parent' sets the parent page for the new page. 'parent' must be the path from the pages root, for example '/user_contributions'. The parent page must exist.
 - 'template' specifies the Twig template to be used by the new page. Use 'page' for a regular page and 'item' for a blog post item.
 - 'pagefrontmatter' is a block of frontmatter that gets inserted in the new page header.
 
