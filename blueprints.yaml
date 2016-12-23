@@ -1,5 +1,6 @@
 name: Add Page By Form
-version: 0.1.0
+version: 1.0.0
+testing: true
 description: Adds a page upon form submission
 icon: plus-square-o
 author:

@@ -2,6 +2,10 @@
 
 The **Add Page By Form** Plugin is for [Grav CMS](http://github.com/getgrav/grav). It allows (anonymous) users to add a page by filling in a form.
 
+## Test release
+
+Note this is a test release. Please post [issues](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues) on [GitHub](https://github.com/bleutzinn/grav-plugin-add-page-by-form).
+
 ## Security
 
 This plugin does not provide any security measures. Please take this in consideration before using this plugin.
