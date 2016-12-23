@@ -94,15 +94,21 @@ class AddPageByFormPlugin extends Plugin
                     $slug = trim($slug, '-');
                     $slug = mb_strtolower($slug, 'UTF-8');
 
-                    $newPageRoute = $header->route;
+                    $parent_page = $this->grav['page']->find($header->parent);
+                    // Check whether the parent page exists
+                    if (!$parent_page) {
+                        throw new \Exception('Unable to add page; the parent "'.$header->parent.'" does not exist');
+                    }
+
+                    $newPageDir = $parent_page->path() . '/' . $slug;
+
                     // Assume this is the first submission of the page, so set $version to 1
                     $version = 0;
-                    $newPageDir = PAGES_DIR . $newPageRoute . '/' . $slug;
 
                     // Keep incrementing the page slug suffix to keep previous versions
                     while (file_exists($newPageDir)) {
                         $version += 1;
-                        $newPageDir = PAGES_DIR . $newPageRoute . '/' . $slug . '_' . $version;
+                        $newPageDir = $parent_page->path() . '/' . $slug . '_' . $version;
                     }
 
                     // Add the page
