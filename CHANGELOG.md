@@ -1,3 +1,9 @@
+# v1.2.0
+##  12/23/2016
+
+1. [](#improved)
+    * Improved new page route handling.
+
 # v1.1.1
 ##  11/17/2016
 
