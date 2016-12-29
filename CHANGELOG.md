@@ -1,3 +1,10 @@
+# v1.2.1
+##  12/29/2016
+
+1. [](#improved)
+    * Improved the usage explanation in the ReadMe.
+    * Removed debug messages.
+
 # v1.2.0
 ##  12/23/2016
 
