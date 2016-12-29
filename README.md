@@ -12,59 +12,46 @@ This plugin does not provide any security measures. Please take this in consider
 
 ## Installation
 
-Installing the Add Page By Form plugin can be done in one of two ways. The GPM (Grav Package Manager) installation method enables you to quickly and easily install the plugin with a simple terminal command, while the manual method enables you to do so via a zip file.
+Typically the plugin should be installed via [GPM](http://learn.getgrav.org/advanced/grav-gpm) (Grav Package Manager):
 
-### GPM Installation (Preferred) (not implemented yet)
+```
+$ bin/gpm install add-page-by-form
+```
 
-The simplest way to install this plugin is via the [Grav Package Manager (GPM)](http://learn.getgrav.org/advanced/grav-gpm) through your system's terminal (also called the command line).  From the root of your Grav install type:
+Alternatively it can be installed via the [Admin Plugin](http://learn.getgrav.org/admin-panel/plugins).
 
-    bin/gpm install add-page-by-form
+A third option is to manualy install the plugin by [downloading](https://github.com/bleutzinn/grav-plugin-add-page-by-form/archive/master.zip) the plugin as a zip file. Copy the zip file to your `/user/plugins` directory, unzip it there and rename the folder to `add-page-by-form`.
 
-This will install the Page Creator plugin into your `/user/plugins` directory within Grav. Its files can be found under `/your/site/grav/user/plugins/add-page-by-form`.
-
-### Manual Installation
-
-To install this plugin, just download the zip version of this repository and unzip it under `/your/site/grav/user/plugins`. Then, rename the folder to `add-page-by-form`. You can find these files on [GitHub](https://github.com/bleutzinn/grav-plugin-add-page-by-form) or via [GetGrav.org](http://getgrav.org/downloads/plugins#extras).
-
-You should now have all the plugin files under
-
-    /your/site/grav/user/plugins/add-page-by-form
-	
-> NOTE: This plugin is a modular component for Grav which requires [Grav](http://github.com/getgrav/grav) and the [Error](https://github.com/getgrav/grav-plugin-error) and [Problems](https://github.com/getgrav/grav-plugin-problems) to operate.
-
-## Configuration
-
-Before configuring this plugin, you should copy the `user/plugins/add-page-by-form/add-page-by-form.yaml` to `user/config/plugins/add-page-by-form.yaml` and only edit that copy.
+## Configuration Defaults
 
 Here is the default configuration and an explanation of available options:
 
-```
-yaml
+```yaml
 enabled: true
-dateformat: 'd-m-Y g:ia'
 ```
-- 'enabled' determines whether the plugin is active
-- 'dateformat' sets how the date time should be displayed
+- 'enabled: true|false' determines whether the plugin is active or not
+
+## Configuration Modifications
+
+Before using this plugin, you should copy the `user/plugins/add-page-by-form/add-page-by-form.yaml` to `user/config/plugins/add-page-by-form.yaml` and use that file to change configuration settings.
 
 ## Usage
 
-Most configuration is set in the page which displays the 'Add page' form to the user. In the example page below the content of the 'pagefrontmatter' block must be seen as default settings for the new page. By defining form fields with the same name you can have the user override the default values by input via the form.  
-
-The first step is to create the page with the form.
-
-To add a page use this example as a starting point:
+The first step is to create a page with the form possibly using this example as a starting point:
 ```
 ---
 title: 'Add New Page'
+template: form
 parent: '/'
 pagefrontmatter:
-    title: 'Default Page Title'
-    content: 'Default Page Content'
+    title: 'My New Page'
     template: page
     visible: true
+    course:
+        title: 'CMPT363 E100'
+        assignment: 'Reading Quiz #1'
     instructor:
         name: 'John Doe'
-        title: 'dr.'
 form:
     name: add-page-form
     fields:
@@ -75,7 +62,7 @@ form:
             autocomplete: true
             type: text
             validate:
-                required: true
+                required: false
         -
             name: content
             label: 'Page Content'
@@ -93,28 +80,27 @@ form:
         -
             addpage: null
         -
-            display: thankyou
+            display: thank-you
 ---
 
 You can add a new page by filling in the form below.
 
-Please enter the a title and write some content to appear on the new page.
+Please enter a title (optional) and write some content to appear on the new page.
 ```
 
-To allow a user to add a blog post simply change the template to 'item':
+To allow a user to add a blog post simply change the 'template' variable to 'item' and set some other blog related variables in the pagefrontmatter block:
 
 ```
 ---
 title: 'Add Blog Post'
+template: form
 parent: '/blog'
 pagefrontmatter:
-    author: 'Default Author Name'
-    title: 'Default Post Title'
-    content: 'Default Post Content'
     template: item
-    instructor:
-        name: 'John Doe'
-        title: 'dr.'
+    title: My new Blog post
+    taxonomy:
+        category: blog
+        tag: [journal, guest]
 form:
     name: add-blog-post-form
     fields:
@@ -151,23 +137,24 @@ form:
         -
             addpage: null
         -
-            display: thankyou
+            display: thank-you
 ---
 
 You can add a new blog post by filling in the form below.
 
 Please enter your name, a title and write something nice.
 ```
-
-The most important settings are:
-
+In the examples above the root level configuration options are:
+- 'title' sets the title of the page containg the form
+- 'template: form' activates the form on this page (not required when the form page is named 'form.md')
 - 'parent' sets the parent page for the new page. 'parent' must be the path from the pages root, for example '/user_contributions'. The parent page must exist.
-- 'template' specifies the Twig template to be used by the new page. Use 'page' for a regular page and 'item' for a blog post item.
+- 'template' specifies the Twig template to be used by the new page. Use 'page' for a regular page and 'item' for a blog post item or use your own custom template.
 - 'pagefrontmatter' is a block of frontmatter that gets inserted in the new page header.
+- 'form' specifies the form.
 
-Values set in the 'pagefrontmatter' block can be overriden by user input if you add a field by the same name in the form.
+The content of the 'pagefrontmatter' block must be seen as default settings for the new page. These default settings can be overridden by user input if you add a form field by the same name. For example in the 'Add New Page' example, the default title is set to 'My New Page'. The user is prompted to enter a title for the new page in the form but does not need to do so because filling in the title field is not mandatory ('required' is false for that field).
 
-Since both 'presets' via the 'pagefrontmatter' block and user input are added to the new page frontmatter it is easy to use any of these values in a Twig template e.g. {{ page.header.author }}.
+The passing on of both the default settings and the form field values to the new page frontmatter makes for an extremely configurable solution. By configuring the page form settings you can to a large extent control the appearence and behaviour of the newly added page. For instance the standard 'blog_item.html.twig' template will to display the new blog post's author name you can use '{{ page.header.author }}' in a Twig template e.g. .
 
 Finally, create a 'thankyou' page as a child page of the form page.
 
@@ -175,8 +162,3 @@ Finally, create a 'thankyou' page as a child page of the form page.
 ## Credits
 
 [Slug generator by Alex Garret](http://codereview.stackexchange.com/questions/44335/slug-url-generator) and of course to everyone who contibutes to Grav.
-
-## To Do
-
-- Improve feedback when an error occurs during page creation.
-
