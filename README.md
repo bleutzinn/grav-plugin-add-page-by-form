@@ -2,10 +2,6 @@
 
 The **Add Page By Form** Plugin is for [Grav CMS](http://github.com/getgrav/grav). It allows users to add a new page by filling in a form. A new page can also be a new blog post by setting the appropriate template.
 
-## Test release
-
-Note this is a test release. Please post [issues](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues) on [GitHub](https://github.com/bleutzinn/grav-plugin-add-page-by-form).
-
 ## Security
 
 This plugin does not provide any security measures. Please take this in consideration before using this plugin.
