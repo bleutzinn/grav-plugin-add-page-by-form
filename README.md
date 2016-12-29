@@ -29,7 +29,7 @@ Here is the default configuration and an explanation of available options:
 ```yaml
 enabled: true
 ```
-- 'enabled: true|false' determines whether the plugin is active or not
+- `enabled: true|false` determines whether the plugin is active or not
 
 ## Configuration Modifications
 
@@ -88,7 +88,7 @@ You can add a new page by filling in the form below.
 Please enter a title (optional) and write some content to appear on the new page.
 ```
 
-To allow a user to add a blog post simply change the 'template' variable to 'item' and set some other blog related variables in the pagefrontmatter block:
+To allow a user to add a blog post simply change the `template` variable to `item` and set some other blog related variables in the pagefrontmatter block:
 
 ```
 ---
@@ -145,18 +145,18 @@ You can add a new blog post by filling in the form below.
 Please enter your name, a title and write something nice.
 ```
 In the examples above the root level configuration options are:
-- 'title' sets the title of the page containg the form
-- 'template: form' activates the form on this page (not required when the form page is named 'form.md')
-- 'parent' sets the parent page for the new page. 'parent' must be the path from the pages root, for example '/user_contributions'. The parent page must exist.
-- 'template' specifies the Twig template to be used by the new page. Use 'page' for a regular page and 'item' for a blog post item or use your own custom template.
-- 'pagefrontmatter' is a block of frontmatter that gets inserted in the new page header.
-- 'form' specifies the form.
+- `title` sets the title of the page containg the form
+- `template: form` activates the form on this page (not required when the form page is named `form.md`)
+- `parent` sets the parent page for the new page. `parent` must be the path from the pages root, for example `/user_contributions`. The parent page must exist.
+- `template` specifies the Twig template to be used by the new page. Use `page` for a regular page and `item` for a blog post item or use your own custom template.
+- `pagefrontmatter` is a block of frontmatter that gets inserted in the new page header.
+- `form` specifies the form.
 
-The content of the 'pagefrontmatter' block must be seen as default settings for the new page. These default settings can be overridden by user input if you add a form field by the same name. For example in the 'Add New Page' example, the default title is set to 'My New Page'. The user is prompted to enter a title for the new page in the form but does not need to do so because filling in the title field is not mandatory ('required' is false for that field).
+The content of the `pagefrontmatter` block must be seen as default settings for the new page. These default settings can be overridden by user input if you add a form field by the same name. For example in the `Add New Page` example, the default title is set to `My New Page`. The user is prompted to enter a title for the new page in the form but does not need to do so because filling in the title field is not mandatory (`required` is false for that field).
 
-The passing on of both the default settings and the form field values to the new page frontmatter makes for an extremely configurable solution. By configuring the page form settings you can to a large extent control the appearence and behaviour of the newly added page. For instance the standard 'blog_item.html.twig' template will to display the new blog post's author name you can use '{{ page.header.author }}' in a Twig template e.g. .
+The passing on of both the default settings and the form field values to the new page frontmatter makes for an extremely configurable solution. By configuring the page form settings you can to a large extent control the appearence and behaviour of the newly added page. For instance the standard `blog_item.html.twig` template will to display the new blog post`s author name you can use `{{ page.header.author }}` in a Twig template e.g. .
 
-Finally, create a 'thankyou' page as a child page of the form page.
+Finally, create a "Thank You"-page (slug: `thank-you`) as a child page of the form page.
 
 
 ## Credits
