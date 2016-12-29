@@ -62,7 +62,7 @@ class AddPageByFormPlugin extends Plugin
                         }
                     }
 
-                    $this->grav['debugger']->addMessage('Content: ' . $content );
+                    //$this->grav['debugger']->addMessage('Content: ' . $content );
 
                     // Assemble the new page frontmatter from the pagefrontmatter block as set in
                     // the form page and the form field values. Field values override values set
@@ -81,7 +81,7 @@ class AddPageByFormPlugin extends Plugin
                         // Convert array to a YAML formatted string
                         $yaml_str = spyc_dump($pagefrontmatter);
                         //dump($yaml_str);
-                        $this->grav['debugger']->addMessage('The \'pagefrontmatter\' block is: ' . $yaml_str );
+                        //$this->grav['debugger']->addMessage('The \'pagefrontmatter\' block is: ' . $yaml_str );
                     }
 
                     // Create s slug to be used as the page filename
@@ -94,21 +94,32 @@ class AddPageByFormPlugin extends Plugin
                     $slug = trim($slug, '-');
                     $slug = mb_strtolower($slug, 'UTF-8');
 
-                    $newPageRoute = $header->route;
+                    if ( isset($header->parent) ) {
+                        $parent_page = $this->grav['page']->find($header->parent);
+                        // Check whether the parent page exists
+                        if (!$parent_page) {
+                            throw new \Exception('Unable to add page; the parent "'.$header->parent.'" does not exist');
+                        }
+                    }
+                    else {
+                        throw new \Exception('Missing "parent" variable in form page header');
+                    }
+
+                    $newPageDir = $parent_page->path() . '/' . $slug;
+
                     // Assume this is the first submission of the page, so set $version to 1
                     $version = 0;
-                    $newPageDir = PAGES_DIR . $newPageRoute . '/' . $slug;
 
-                    // Keep incrementing the page slug suffix to keep previous versions
+                    // Keep incrementing the page slug suffix to keep earlier versions / duplicates
                     while (file_exists($newPageDir)) {
                         $version += 1;
-                        $newPageDir = PAGES_DIR . $newPageRoute . '/' . $slug . '_' . $version;
+                        $newPageDir = $parent_page->path() . '/' . $slug . '-' . $version;
                     }
 
                     // Add the page
                     try {
                         // Create the directory
-                        $pageDir = mkdir($newPageDir, 0775, true);
+                        $pageDir = mkdir($newPageDir, 0755, true);
                         if (!$pageDir) {
                             throw new \Exception('Unable to add page; can not create directory "' . $newPageDir . '"');
                         }
