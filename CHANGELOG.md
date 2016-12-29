@@ -1,3 +1,9 @@
+# v1.2.2
+##  12/29/2016
+
+1. [](#improved)
+    * Removed note about the (previous) test release in the ReadMe.
+
 # v1.2.1
 ##  12/29/2016
 
