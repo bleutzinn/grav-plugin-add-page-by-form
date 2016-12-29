@@ -94,10 +94,15 @@ class AddPageByFormPlugin extends Plugin
                     $slug = trim($slug, '-');
                     $slug = mb_strtolower($slug, 'UTF-8');
 
-                    $parent_page = $this->grav['page']->find($header->parent);
-                    // Check whether the parent page exists
-                    if (!$parent_page) {
-                        throw new \Exception('Unable to add page; the parent "'.$header->parent.'" does not exist');
+                    if ( isset($header->parent) ) {
+                        $parent_page = $this->grav['page']->find($header->parent);
+                        // Check whether the parent page exists
+                        if (!$parent_page) {
+                            throw new \Exception('Unable to add page; the parent "'.$header->parent.'" does not exist');
+                        }
+                    }
+                    else {
+                        throw new \Exception('Missing "parent" variable in form page header');
                     }
 
                     $newPageDir = $parent_page->path() . '/' . $slug;
