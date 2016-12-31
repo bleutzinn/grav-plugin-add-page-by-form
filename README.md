@@ -2,6 +2,8 @@
 
 The **Add Page By Form** Plugin is for [Grav CMS](http://github.com/getgrav/grav). It allows users to add a new page by filling in a form. A new page can also be a new blog post by setting the appropriate template.
 
+When a textarea field is given the `id: simplemde` then it will activate the [SimpleMDE Markdown Editor](https://github.com/NextStepWebs/simplemde-markdown-editor) and content entered in the textarea will be saved to the new page content in markdown format.
+
 ## Security
 
 This plugin does not provide any security measures. Please take this in consideration before using this plugin.
@@ -33,7 +35,13 @@ Before using this plugin, you should copy the `user/plugins/add-page-by-form/add
 
 ## Usage
 
-The first step is to create a page with the form possibly using this example as a starting point:
+Using is a two step proces:
+
+1. Create a form page.
+2. Create a "Thank You"-page (slug: `thank-you`) as a child page of the form page.
+
+For the form page two examples are given here. The first set's up a form that will create a new page. The second will create a new blog item
+
 ```
 ---
 title: 'Add New Page'
@@ -61,6 +69,7 @@ form:
                 required: false
         -
             name: content
+            id: simplemde
             label: 'Page Content'
             size: long
             placeholder: 'Write the content here'
@@ -84,7 +93,7 @@ You can add a new page by filling in the form below.
 Please enter a title (optional) and write some content to appear on the new page.
 ```
 
-To allow a user to add a blog post simply change the `template` variable to `item` and set some other blog related variables in the pagefrontmatter block:
+To allow a user to add a blog post simply change the `template` variable to `item` and set some other blog related variables in the page frontmatter block:
 
 ```
 ---
@@ -118,6 +127,7 @@ form:
                 required: true
         -
             name: content
+            id: simplemde
             label: 'Page Content'
             size: long
             placeholder: 'Write the content here'
@@ -150,11 +160,10 @@ In the examples above the root level configuration options are:
 
 The content of the `pagefrontmatter` block must be seen as default settings for the new page. These default settings can be overridden by user input if you add a form field by the same name. For example in the `Add New Page` example, the default title is set to `My New Page`. The user is prompted to enter a title for the new page in the form but does not need to do so because filling in the title field is not mandatory (`required` is false for that field).
 
-The passing on of both the default settings and the form field values to the new page frontmatter makes for an extremely configurable solution. By configuring the page form settings you can to a large extent control the appearence and behaviour of the newly added page. For instance the standard `blog_item.html.twig` template will to display the new blog post`s author name you can use `{{ page.header.author }}` in a Twig template e.g. .
-
-Finally, create a "Thank You"-page (slug: `thank-you`) as a child page of the form page.
+The passing on of both the default settings and the form field values to the new page frontmatter makes for an extremely configurable solution. By configuring the page form settings you can to a large extent control the appearence and behaviour of the newly added page by using the frontmatter variables in your Twig templates.
 
 
 ## Credits
 
-[Slug generator by Alex Garret](http://codereview.stackexchange.com/questions/44335/slug-url-generator) and of course to everyone who contibutes to Grav.
+- Alex Garret for [Slug generator](http://codereview.stackexchange.com/questions/44335/slug-url-generator) and of course to everyone who contibutes to Grav.
+- Wes Cossick for [SimpleMDE Markdown Editor](https://github.com/NextStepWebs/simplemde-markdown-editor)

@@ -1,3 +1,9 @@
+# v1.3.0
+##  12/31/2016
+
+1. [](#new)
+    * Added the SimpleMDE Markdown Editor.
+
 # v1.2.2
 ##  12/29/2016
 
