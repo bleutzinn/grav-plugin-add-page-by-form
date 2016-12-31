@@ -173,6 +173,23 @@ class AddPageByFormPlugin extends Plugin
             return;
         }
 
+        // Enable the events we are interested in
+        $this->enable([
+            'onPageInitialized' => ['onPageInitialized', 0]
+        ]);
+    }
+
+    public function onPageInitialized()
+    {
+        $assets = $this->grav['assets'];
+
+        // Add SimpleMDE Markdown Editor
+        $assets->addCss('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.css', 1);
+        $assets->addJs('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.js', 1);
+        // Load inline Javascript code from configuration file
+        $assets->addInlineJs(file_get_contents('plugin://add-page-by-form/assets/js/simplemde_config.js'), 1);
     }
 
 }
+
+
