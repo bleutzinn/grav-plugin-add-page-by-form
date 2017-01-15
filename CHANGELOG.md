@@ -1,3 +1,9 @@
+# v1.3.1
+##  01/15/2017
+
+1. [](#improved)
+    * Added jQuery as an asset.
+
 # v1.3.0
 ##  12/31/2016
 
