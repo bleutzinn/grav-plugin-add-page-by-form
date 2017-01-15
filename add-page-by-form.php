@@ -183,9 +183,13 @@ class AddPageByFormPlugin extends Plugin
     {
         $assets = $this->grav['assets'];
 
+        // Add jQuery library
+        $assets->add('jquery', 101);
+
         // Add SimpleMDE Markdown Editor
         $assets->addCss('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.css', 1);
         $assets->addJs('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.js', 1);
+
         // Load inline Javascript code from configuration file
         $assets->addInlineJs(file_get_contents('plugin://add-page-by-form/assets/js/simplemde_config.js'), 1);
     }
