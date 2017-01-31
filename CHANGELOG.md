@@ -1,3 +1,9 @@
+# v1.3.2
+##  01/31/2017
+
+1. [](#improved)
+    * Removed the spyc.php class dependency; the page creation and YAML frontmatter handling is now done "the Grav way".
+
 # v1.3.1
 ##  01/15/2017
 
