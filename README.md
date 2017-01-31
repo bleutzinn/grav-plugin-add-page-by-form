@@ -38,9 +38,9 @@ Before using this plugin, you should copy the `user/plugins/add-page-by-form/add
 Using is a two step proces:
 
 1. Create a form page.
-2. Create a "Thank You"-page (slug: `thank-you`) as a child page of the form page.
+2. Create a "Thank You" page (slug: `thank-you`) as a child page of the form page.
 
-For the form page two examples are given here. The first set's up a form that will create a new page. The second will create a new blog item
+For the form page two examples are given here. The first set's up a form that will create a new page. The second will create a new blog item.
 
 ```
 ---
@@ -93,7 +93,7 @@ You can add a new page by filling in the form below.
 Please enter a title (optional) and write some content to appear on the new page.
 ```
 
-To allow a user to add a blog post simply change the `template` variable to `item` and set some other blog related variables in the page frontmatter block:
+To allow a user to add a blog post simply change the `template` variable to `item` and set some other blog related variables in the `pagefrontmatter` block:
 
 ```
 ---
@@ -165,5 +165,6 @@ The passing on of both the default settings and the form field values to the new
 
 ## Credits
 
-- Alex Garret for [Slug generator](http://codereview.stackexchange.com/questions/44335/slug-url-generator) and of course to everyone who contibutes to Grav.
-- Wes Cossick for [SimpleMDE Markdown Editor](https://github.com/NextStepWebs/simplemde-markdown-editor)
+- Team Grav and everyone who contributes to Grav;
+- Alex Garret for [Slug generator](http://codereview.stackexchange.com/questions/44335/slug-url-generator);
+- Wes Cossick for [SimpleMDE Markdown Editor](https://github.com/NextStepWebs/simplemde-markdown-editor).
