@@ -1,3 +1,15 @@
+# v1.4.0
+##  02/12/2017
+
+1. [](#new)
+    * Added the ability to include the File field in the form. When `destination` is `@self` uploaded files are stored in the new page folder.
+
+# v1.3.2
+##  01/31/2017
+
+1. [](#improved)
+    * Removed the spyc.php class dependency; the page creation and YAML frontmatter handling is now done "the Grav way".
+
 # v1.3.1
 ##  01/15/2017
 
