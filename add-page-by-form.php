@@ -179,12 +179,12 @@ class AddPageByFormPlugin extends Plugin
                     $yaml_str = '';
                     if ( isset($header->pagefrontmatter) && is_array($header->pagefrontmatter) ) {
                         $pagefrontmatter = $header->pagefrontmatter;
-                        $formdata = $form->value()->toArray();
                         if (isset($formdata)) {
                             $pagefrontmatter = array_merge($pagefrontmatter, $formdata);
                         }
                         // Remove content from array
                         unset($pagefrontmatter['content']);
+                        unset($pagefrontmatter['_json']);
                     }
 
                     // Create s slug to be used as the page filename
