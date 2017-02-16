@@ -9,7 +9,6 @@ use Grav\Common\Page\Page;
 use RocketTheme\Toolbox\File\File;
 use Symfony\Component\Yaml\Yaml;
 
-
 /**
  * Class AddPageByFormPlugin
  * @package Grav\Plugin
@@ -55,7 +54,6 @@ class AddPageByFormPlugin extends Plugin
             'onPageInitialized' => ['onPageInitialized', 0],
         ]);
     }
-
 
     public function onPageInitialized()
     {
