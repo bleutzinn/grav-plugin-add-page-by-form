@@ -237,8 +237,8 @@ class AddPageByFormPlugin extends Plugin
                         $path = $parent_page->path() . DS . $slug. DS . $page->name();
                         $page->filePath($path);
                         $header = $pagefrontmatter;
-                        $page->header((object) $header);
-                        $page->frontmatter(Yaml::dump((array) $page->header(), 10, 2, false));
+                        $page->header((object)$header);
+                        $page->frontmatter(Yaml::dump((array)$page->header()));
                         $page->rawMarkdown((string) $content);
                         $page->content((string) $content);
                         $page->file()->markdown($page->rawMarkdown());
