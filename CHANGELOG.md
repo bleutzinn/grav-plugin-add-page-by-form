@@ -1,3 +1,10 @@
+# v1.4.1
+##  02/16/2017
+
+1. [](#improved)
+    * Simplified YAML frontmatter formatting as suggested in
+https://github.com/getgrav/grav/issues/1287#issuecomment-279965492
+
 # v1.4.0
 ##  02/12/2017
 
