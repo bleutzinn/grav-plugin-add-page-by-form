@@ -1,3 +1,9 @@
+# v1.4.2
+##  03/22/2017
+
+1. [](#new)
+    * Cleaned up code for release.
+
 # v1.4.1
 ##  02/16/2017
 

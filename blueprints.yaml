@@ -1,5 +1,5 @@
 name: Add Page By Form
-version: 1.4.1
+version: 1.4.2
 description: Adds a page upon form submission
 icon: plus-square-o
 author:
@@ -25,4 +25,13 @@ form:
         0: Disabled
       validate:
         type: bool
-
+    editor:
+      type: toggle
+      label: Use markdown editor 
+      highlight: 1
+      default: 0
+      options:
+        1: Enabled
+        0: Disabled
+      validate:
+        type: bool
