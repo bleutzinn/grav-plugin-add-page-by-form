@@ -35,7 +35,6 @@ class AddPageByFormPlugin extends Plugin
             'onPluginsInitialized' => ['onPluginsInitialized', 0],
             'onFormProcessed' => ['onFormProcessed', 0],
             'onFormValidationProcessed' => ['onFormValidationProcessed', 0]
-            // ALS onFormValidationProcessed WORDT AANGEROEPEN FAALT DE FILE MOVE VAN DE FORM PLUGIN
         ];
     }
 
@@ -79,41 +78,27 @@ class AddPageByFormPlugin extends Plugin
         $uri = $grav['uri']->url;
         $session = $grav['session'];
 
-        // if files have been uploaded
-        // and
-        // destination is 'self'
-        // then prepare for moving the files to the new page
-        // else do nothing
-
-        //$this->uploads[] = [];
+        /*  if files have been uploaded and destination is 'self'
+            then prepare for moving the files to the new page
+            else do nothing
+        */
         $this->moveSelfFiles = false;
         $destination = $config->get('plugins.form.files.destination', '@self');
         // Get queue from session
         $queue = $session->getFlashObject('files-upload');
-        //dump('queue is '.serialize($queue));
         $thisQueue = $queue[base64_encode($uri)];
         $this->grav['log']->notice('This queue: '.serialize($thisQueue));
         if ($thisQueue) {
-            //dump('This queue is filled');
-
             $formdata = $form->toArray();
-            //dump($formdata);
             $process = isset($formdata['process']) ? $formdata['process'] : [];
-
             $formDef = $grav['page']->header()->form;
-            //dump($formDef);
-            //dump($formDef['fields']);
             $fields = $formDef['fields'];
             foreach ($fields as $array) {
-                //dump($array);
-                //dump(array_key_exists('destination', $array) );
                 if (array_key_exists('destination', $array)) {
                     $destination = $array['destination'];
-                    //dump($destination);
                     break;
                 }
             }
-
             if (is_array($process)) {
                 foreach ($process as $action => $data) {
                     if (isset($action)) {
@@ -131,7 +116,6 @@ class AddPageByFormPlugin extends Plugin
             $this->grav['log']->notice('Will move uploaded files once form gets submitted');
             // Save uploaded files properties to process in onFormProcessed() 
             $this->uploads[] = $thisQueue;
-            //dump($thisQueue);
         }
         else {
             // Restore queue in session again
@@ -254,7 +238,6 @@ class AddPageByFormPlugin extends Plugin
                     // Move uploaded files to the new page folder
                     if ($this->moveSelfFiles) {
                         $uploads = $this->uploads;
-                        //dump($uploads);
                         foreach ($uploads as $key => $upload) {
                             foreach ($upload as $key => $files) {
                                 foreach ($files as $destination => $file) {
