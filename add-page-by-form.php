@@ -1,11 +1,12 @@
 <?php
 namespace Grav\Plugin;
 
+use Grav\Common\Filesystem\Folder;
 use Grav\Common\Grav;
 use Grav\Common\Plugin;
 use Grav\Common\Uri;
-use RocketTheme\Toolbox\Event\Event;
 use Grav\Common\Page\Page;
+use RocketTheme\Toolbox\Event\Event;
 use RocketTheme\Toolbox\File\File;
 use Symfony\Component\Yaml\Yaml;
 
@@ -16,8 +17,11 @@ use Symfony\Component\Yaml\Yaml;
 class AddPageByFormPlugin extends Plugin
 {
 
+    public $newPageRoute = '?';
+
     private $uploads = array();
     private $moveSelfFiles = false;
+
 
     /**
      * @return array
@@ -38,38 +42,6 @@ class AddPageByFormPlugin extends Plugin
         ];
     }
 
-    /**
-     * Initialize the plugin
-     */
-    public function onPluginsInitialized()
-    {
-        // Don't proceed if we are in the admin plugin
-        if ($this->isAdmin()) {
-            return;
-        }
-
-        // Enable the events we are interested in
-        $this->enable([
-            'onPageInitialized' => ['onPageInitialized', 0],
-        ]);
-    }
-
-    public function onPageInitialized()
-    {
-        $assets = $this->grav['assets'];
-
-        // Add jQuery library
-        $assets->add('jquery', 101);
-
-        // Add SimpleMDE Markdown Editor
-        $assets->addCss('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.css', 1);
-        $assets->addJs('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.js', 1);
-
-        // Load inline Javascript code from configuration file
-        $assets->addInlineJs(file_get_contents('plugin://add-page-by-form/assets/js/simplemde_config.js'), 1);
-
-    }
-
     public function onFormValidationProcessed(Event $event)
     {
         $grav = Grav::instance();
@@ -87,7 +59,6 @@ class AddPageByFormPlugin extends Plugin
         // Get queue from session
         $queue = $session->getFlashObject('files-upload');
         $thisQueue = $queue[base64_encode($uri)];
-        $this->grav['log']->notice('This queue: '.serialize($thisQueue));
         if ($thisQueue) {
             $formdata = $form->toArray();
             $process = isset($formdata['process']) ? $formdata['process'] : [];
@@ -113,7 +84,6 @@ class AddPageByFormPlugin extends Plugin
         }
 
         if (($destination === '@self' || $destination === 'self@') && $this->moveSelfFiles) {
-            $this->grav['log']->notice('Will move uploaded files once form gets submitted');
             // Save uploaded files properties to process in onFormProcessed() 
             $this->uploads[] = $thisQueue;
         }
@@ -121,7 +91,6 @@ class AddPageByFormPlugin extends Plugin
             // Restore queue in session again
             $session->setFlashObject('files-upload', $queue);
             $this->moveSelfFiles = false;
-            $this->grav['log']->notice('Will not move uploaded files; handing over back to Form plugin');
         }
     }
 
@@ -134,13 +103,116 @@ class AddPageByFormPlugin extends Plugin
         switch ($action) {
             case 'addpage':
                 if(isset($_POST)) {
-                    // Get plugin config settings
-                    $dateFormat = $this->config->get('plugins.add-page-by-form.dateformat');
-
-                    // Get all form fields
-                    $formdata = $form->value()->toArray();
 
                     $page = $this->grav['page'];
+                    $folder = $page->folder();
+                    $header = $page->header();
+
+                    $parent = '';
+                    $subroute = '';
+                    // Get settings from pageconfig block
+                    $positives = ['1','on','true'];
+                    if ( isset($header->pageconfig) && is_array($header->pageconfig) ) {
+                        $pageconfig = $header->pageconfig;
+                        if ( isset($header->pageconfig['parent']) ) {
+                            $parent = strtolower(trim($header->pageconfig['parent']));
+                        }
+                        if ( isset($header->pageconfig['subroute']) ) {
+                            $subroute = strtolower(trim($header->pageconfig['subroute']));
+                        }
+                        if ( isset($header->pageconfig['overwrite']) ) {
+                            $overwrite = in_array(strtolower(trim($header->pageconfig['overwrite'])), $positives);
+                        }
+                        if ( isset($header->pageconfig['username']) ) {
+                            $addUsername = in_array(strtolower(trim($header->pageconfig['username'])), $positives);
+                        }
+                        if ( isset($header->pageconfig['timestamp']) ) {
+                            $addTimestamp = in_array(strtolower(trim($header->pageconfig['timestamp'])), $positives);
+                        }
+                    }
+
+                    // Get all 'normal' form fields
+                    $formdata = $form->value()->toArray();
+
+                    // Override parent
+                    if (isset($formdata['parent']) ) {
+                        $parent = strtolower(trim($formdata['parent']));
+                    }
+                    // Removes trailing slash if present
+                    $parent = rtrim($parent, DS);
+
+                    // Get parent page
+                    if ($parent != '') {
+                        if ($parent[0] != DS) {
+                            $parent = $page->route() . DS . $parent;
+                        }
+                        $parent_page = $this->grav['page']->find($parent);
+                        // Check whether the parent page exists
+                        if (!$parent_page) {
+                            $this->grav['log']->error('The parent "'.$parent.'" does not exist.');
+                            // Gracefully continue by adding the new page as a child page of the form page
+                            $parent_page = $page;
+                        }
+                    }
+                    else {
+                        $parent_page = $page;
+                    }
+
+/* >>>> BTW at this point $parent_page is a page <<<< */
+
+                    // Get language and apply to the new page
+                    $language = trim(basename($parent_page->extension(), 'md'), '.') ?: null;
+
+                    // Override subroute
+                    if (isset($formdata['subroute']) ) {
+                        $subroute = strtolower(trim($formdata['subroute']));
+                    }
+                    // Removes preceding and trailing slashes if present
+                    $subroute = trim($subroute, DS);
+
+                    if ($subroute != '') {
+                        //$subroute = 'new/newer';
+                        // Create subroute path if it doesn't exist
+                        $path = $parent_page->path();
+                        $route = $parent_page->route();
+                        $slugs = explode(DS, $subroute);
+                        for ($i=0; $i < count($slugs); $i++) {
+                            $route = $route . DS . $slugs[$i];
+                            if ($page = $this->grav['page']->find($route)) {
+                                $path = $path . DS . $page->folder();
+                            }
+                            else {
+                                $path = $path . DS . $slugs[$i];
+                            }
+                            if (!file_exists($path)) {
+                                Folder::create($path);
+                            }
+                        }
+                        $parent = $parent . DS . $subroute;
+                    }
+                    
+                    $parentPagePath = $path;
+                    $parentPageRoute = $route;
+
+                    // Get all form fields of type 'file' 
+                    $uploads = $this->uploads;
+                    foreach ($uploads as $key => $upload) {
+                        foreach ($upload as $key => $files) {
+                            $filefields[$key] = array();
+                            $i = 0;
+                            foreach ($files as $destination => $file) {
+                                $filefields[$key][$i] = '';
+                                foreach ($file as $property => $value) {
+                                    if ($property != 'tmp_name') {
+                                        $filefields[$key][$i][$property] = $value;
+                                    }
+                                }
+                                $filePath = $filefields[$key][$i]['path'];
+                                $filefields[$key][$i]['path'] = substr($filePath, 0, strrpos($filePath, DS));
+                                $i++;
+                            }
+                        }
+                    }
 
                     // Extract the content; if not present as a form value then fallback to frontmatter
                     $content = 'No content set';
@@ -152,79 +224,114 @@ class AddPageByFormPlugin extends Plugin
                             $content = $header->pagefrontmatter->content;
                         }
                     }
-                    // Assemble the new page frontmatter from the pagefrontmatter block as set in
-                    // the form page and the form field values. Field values override values set
-                    // in the pagefrontmatter block
-                    $folder = $page->folder();
-                    $header = $page->header();
 
-                    $yaml_str = '';
+                    // Get plugin config settings
+                    $dateFormat = $this->config->get('plugins.add-page-by-form.dateformat');
+
+                    // Assemble the new page frontmatter from the pagefrontmatter block as set in
+                    // the form page and the form field values. Form field values override values
+                    // set in the pagefrontmatter block
                     if ( isset($header->pagefrontmatter) && is_array($header->pagefrontmatter) ) {
                         $pagefrontmatter = $header->pagefrontmatter;
                         if (isset($formdata)) {
                             $pagefrontmatter = array_merge($pagefrontmatter, $formdata);
                         }
-                        // Remove content from array
-                        unset($pagefrontmatter['content']);
+                        if (isset($filefields)) {
+                            $pagefrontmatter = array_merge($pagefrontmatter, $filefields);
+                        }
+                        // Override overwrite mode (assume a checkbox field)
+                        if (isset($formdata['overwrite']) ) {
+                            $overwrite = ((string)$formdata['overwrite'] === '1');
+                        }
+                        
+                        // Remove unwanted items
                         unset($pagefrontmatter['_json']);
+                        unset($pagefrontmatter['content']);
+                        // Add extra items
+                        $pagefrontmatter['parent'] = $parentPageRoute;
+                        $pagefrontmatter['overwrite'] = $overwrite;
+
+                        /* Here you can insert anything else into the new page frontmatter
+
+                            $result = 'Hello World';
+                            $pagefrontmatter['result'] = $result;
+
+                        */
                     }
-
-                    // Create s slug to be used as the page filename
-                    // Credits: Alex Garrett
-                    $slug = $pagefrontmatter['title'];
-                    $lettersNumbersSpacesHyphens = '/[^\-\s\pN\pL]+/u';
-                    $spacesDuplicateHypens = '/[\-\s]+/';
-                    $slug = preg_replace($lettersNumbersSpacesHyphens, '', $slug);
-                    $slug = preg_replace($spacesDuplicateHypens, '-', $slug);
-                    $slug = trim($slug, '-');
-                    $slug = mb_strtolower($slug, 'UTF-8');
-
-                    if ( isset($header->parent) ) {
-                        $parent_page = $this->grav['page']->find($header->parent);
-                        // Check whether the parent page exists
-                        if (!$parent_page) {
-                            throw new \Exception('Unable to add page; the parent "'.$header->parent.'" does not exist');
+                    
+                    // Create a slug to be used as the page name (used publicly in URLs etc.)
+                    $slug = $this->sanitizeFilename($pagefrontmatter['title']);
+                    $newPageFolder = $parentPagePath . DS . $slug;
+                    // Check overwrite mode
+                    if ($overwrite) {
+                        // Overwrite page; simply delete folder to remove existing media as well
+                        if (file_exists($newPageFolder)) {
+                            Folder::delete($newPageFolder);
                         }
                     }
                     else {
-                        throw new \Exception('Missing "parent" variable in form page header');
+                        // Scan for the next available sequential suffix
+                        $version = 0;
+                        // Keep incrementing the page slug suffix to keep earlier versions / duplicates
+                        while (file_exists($newPageFolder)) {
+                            $version += 1;
+                            $newPageFolder = $parentPagePath . DS . $slug . '-' . $version;
+                        }
+                        if ($version > 0) {
+                            $slug = $slug . '-' . $version;
+                        }
                     }
-
-                    $newPageDir = $parent_page->path() . '/' . $slug;
-                    // Assume this is the first submission of the page, so set $version to 1
-                    $version = 0;
-                    // Keep incrementing the page slug suffix to keep earlier versions / duplicates
-                    while (file_exists($newPageDir)) {
-                        $version += 1;
-                        $newPageDir = $parent_page->path() . '/' . $slug . '-' . $version;
-
-                    }
-                    if ($version > 0) {
-                        $slug = $slug . '-' . $version;
-                    }
-
-                    // Add the page
+                    
+                    // Create and add the page to Grav
                     try {
                         /** @var Pages $pages */
                         $pages = $this->grav['pages'];
-                        // Create page.
+                        // Create new page
                         $page = new Page;
-                        $language = trim(basename($parent_page->extension(), 'md'), '.') ?: null;
+                        
                         if ($language != '') {
                           $page->name('default.' . $language . '.md');
                         }
                         else {
                             $page->name('default.md');
                         }
-                        $path = $parent_page->path() . DS . $slug. DS . $page->name();
+                        // Store route to new page
+                        $this->newPageRoute = $parentPageRoute . DS . $slug;
+                        $path = $parentPagePath . DS . $slug. DS . $page->name();
                         $page->filePath($path);
+                        $page->route($this->newPageRoute);
                         $header = $pagefrontmatter;
                         $page->header((object)$header);
                         $page->frontmatter(Yaml::dump((array)$page->header()));
                         $page->rawMarkdown((string) $content);
                         $page->content((string) $content);
                         $page->file()->markdown($page->rawMarkdown());
+                        // Actual page file save
                         $page->save();
+                        // Add page to Pages object with routing info
+                        $pages->addPage($page, $path);
+
+                        // Move uploaded files to the new page folder
+                        if ($this->moveSelfFiles) {
+                            $uploads = $this->uploads;
+                            foreach ($uploads as $key => $upload) {
+                                foreach ($upload as $key => $files) {
+                                    foreach ($files as $destination => $file) {
+                                        $filename = substr($destination, strrpos($destination, DS) + 1);
+                                        $destination = $file['path'];
+                                        $tmp_name = $file['tmp_name'];
+                                        if (strpos($destination, 'user/pages/' . $folder) !== false) {
+                                            // Destiniation is '@self'
+                                            $destinationFilePath = $parentPagePath . DS . $slug . DS . $filename;
+                                        }
+                                        else {
+                                            $destinationFilePath = ROOT_DIR . $destination;
+                                        }
+                                        rename($tmp_name, $destinationFilePath);
+                                    }
+                                }
+                            }
+                        }
                     }
                     catch (\Exception $e) {
                         $this->grav['debugger']->addMessage($e->getMessage());
@@ -234,31 +341,96 @@ class AddPageByFormPlugin extends Plugin
                         $event->stopPropagation();
                         return;
                     }
-
-                    // Move uploaded files to the new page folder
-                    if ($this->moveSelfFiles) {
-                        $uploads = $this->uploads;
-                        foreach ($uploads as $key => $upload) {
-                            foreach ($upload as $key => $files) {
-                                foreach ($files as $destination => $file) {
-                                    foreach ($file as $properties => $value) {
-                                        $this->grav['log']->notice('properties: ' . $properties . '; value: ' . $value);
-                                    }
-                                    $destination = $file['path']; 
-                                    $tmp_name = $file['tmp_name'];
-                                    if (strpos($destination, 'user/pages/' . $folder) !== false) {
-                                        $filename = substr($destination, strrpos($destination, DS) + 1);
-                                        $originFilePath = ROOT_DIR . $destination;
-                                        $destinationFilePath = $parent_page->path() . DS . $slug . DS . $filename;
-                                        rename($tmp_name, $destinationFilePath);
-                                    }
-                                }
-                            }
-                        }
-                    }
                 }
+                break;
+            case 'display':
+                $route = (string)$params;
+                // The Form plugin does not know how to handle '@self' as a
+                // display parameter, so do the redirect to the new page
+                if (strtolower($route) == '@self') {
+                    $route = $this->newPageRoute;
+                    /** @var Twig $twig */
+                    $twig = $this->grav['twig'];
+                    $twig->twig_vars['form'] = $form;
+                    /** @var Pages $pages */
+                    $pages = $this->grav['pages'];
+                    $page = $pages->dispatch($route, false);
+                    // Redirect to the added page
+                    unset($this->grav['page']);
+                    $this->grav['page'] = $page;
+                    $this->grav->redirect($route);
+                }
+                break;
         }
     }
+
+
+    public function onPageInitialized()
+    {
+        $assets = $this->grav['assets'];
+
+        // Add jQuery library
+        $assets->add('jquery', 101);
+
+        // Add SimpleMDE Markdown Editor
+        $assets->addCss('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.css', 100);
+        $assets->addJs('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.js', 100);
+        
+        // Add custom styles
+        $assets->addCss('plugin://add-page-by-form/assets/css/customstyles.css', 110);
+
+        // Load inline Javascript code from configuration file
+        $assets->addInlineJs(file_get_contents('plugin://add-page-by-form/assets/js/simplemde_config.js'), 110);
+
+    }
+
+    /**
+     * Initialize the plugin
+     */
+    public function onPluginsInitialized()
+    {
+        // Don't proceed if we are in the admin plugin
+        if ($this->isAdmin()) {
+            return;
+        }
+
+        // Enable the events we are interested in
+        $this->enable([
+            'onPageInitialized' => ['onPageInitialized', 0],
+        ]);
+    }
+
+
+    public function sanitizeFilename($f) {
+        /* Source: http://www.house6.com/blog/?p=83
+            a combination of various methods
+            we don't want to convert html entities, or do any url encoding
+            we want to retain the "essence" of the original file name, if possible
+            char replace table found at:
+            http://www.php.net/manual/en/function.strtr.php#98669
+            Input:
+            "Agnes Åström's _amazing!!_ photo (#2) of the house of Kjell Bækkelund [taken @ Stockholm 05-05-2003].jpg";
+            Output:
+            "agnes-astroms-_amazing_-photo-nr-2-of-the-house-of-kjell-bakkelund-taken-at-stockholm-05-05-2003.jpg"
+        */
+        $replace_chars = array(
+            'Š'=>'S', 'š'=>'s', 'Ð'=>'Dj','Ž'=>'Z', 'ž'=>'z', 'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A',
+            'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 'È'=>'E', 'É'=>'E', 'Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I', 'Í'=>'I', 'Î'=>'I',
+            'Ï'=>'I', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U', 'Ú'=>'U',
+            'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss','à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a',
+            'å'=>'a', 'æ'=>'a', 'ç'=>'c', 'è'=>'e', 'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i',
+            'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o', 'ö'=>'o', 'ø'=>'o', 'ù'=>'u',
+            'ú'=>'u', 'û'=>'u', 'ý'=>'y', 'ý'=>'y', 'þ'=>'b', 'ÿ'=>'y', 'ƒ'=>'f'
+        );
+        $f = strtr($f, $replace_chars);
+        // convert & to "and", @ to "at", and # to "number"
+        $f = preg_replace(array('/[\&]/', '/[\@]/', '/[\#]/'), array('-and-', '-at-', '-nr-'), $f);
+        $f = preg_replace('/[^(\x20-\x7F)]*/','', $f); // removes any special chars we missed
+        $f = str_replace(' ', '-', $f); // convert space to hyphen 
+        $f = str_replace('\'', '', $f); // removes apostrophes
+        $f = preg_replace('/[^\w\-\.]+/', '', $f); // remove non-word chars (leaving hyphens and periods)
+        $f = preg_replace('/[\-]+/', '-', $f); // converts groups of hyphens into one
+        return strtolower($f);
+    }
+
 }
-
-
