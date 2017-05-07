@@ -3,15 +3,17 @@
 
 1. [](#new)
     * Support for multiple textarea editors ([issue #21](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues/21))
-    * Support for `display: @self` ([issue #23](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues/23))
+    * Support for `process.display: @self` ([issue #23](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues/23))
     * Added `overwrite` config frontmatter variable
     * Added an optional `subroute` configuration variable
 1. [](#improved)
     * In the form page frontmatter configuration variables are separated from variables which main purpose is to get passed on to the new page
-    * Uploaded file properties are now added to the new page frontmatter
-    * Improved save slug generator
+    * Uploaded file properties are now included in the new page frontmatter
+    * Improved safe slug generator
+    * Removed "use editor" option from blueprints.yaml
 1. [](#bugfix)
-    * Fixed a problem that prevented different destinations for file uploads
+    * Fixed an issue with form pages outside the web root ([issue #20](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues/20))
+    * Fixed a problem that prevented having different destinations for file uploads
 
 # v1.4.2
 ##  03/22/2017
