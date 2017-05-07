@@ -110,6 +110,8 @@ class AddPageByFormPlugin extends Plugin
 
                     $parent = '';
                     $subroute = '';
+                    $addUsername = false;
+                    $addTimestamp = false;
                     // Get settings from pageconfig block
                     $positives = ['1','on','true'];
                     if ( isset($header->pageconfig) && is_array($header->pageconfig) ) {
@@ -247,9 +249,13 @@ class AddPageByFormPlugin extends Plugin
                         // Remove unwanted items
                         unset($pagefrontmatter['_json']);
                         unset($pagefrontmatter['content']);
-                        // Add extra items
+
+                        // Add items from 'pageconfig' block
                         $pagefrontmatter['parent'] = $parentPageRoute;
                         $pagefrontmatter['overwrite'] = $overwrite;
+                        if ($addUsername) {
+                            $pagefrontmatter['username'] = $this->grav['session']->user->username;
+                        }
 
                         /* Here you can insert anything else into the new page frontmatter
 
