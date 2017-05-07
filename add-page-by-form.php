@@ -99,14 +99,14 @@ class AddPageByFormPlugin extends Plugin
         $form = $event['form'];
         $action = $event['action'];
         $params = $event['params'];
-    
+
         switch ($action) {
             case 'addpage':
                 if(isset($_POST)) {
 
                     $page = $this->grav['page'];
-                    $folder = $page->folder();
                     $header = $page->header();
+                    $formPageRelativePagePath = $page->relativePagePath();
 
                     $parent = '';
                     $subroute = '';
@@ -172,11 +172,11 @@ class AddPageByFormPlugin extends Plugin
                     // Removes preceding and trailing slashes if present
                     $subroute = trim($subroute, DS);
 
+                    $path = $parent_page->path();
+                    $route = $parent_page->route();
+
                     if ($subroute != '') {
-                        //$subroute = 'new/newer';
                         // Create subroute path if it doesn't exist
-                        $path = $parent_page->path();
-                        $route = $parent_page->route();
                         $slugs = explode(DS, $subroute);
                         for ($i=0; $i < count($slugs); $i++) {
                             $route = $route . DS . $slugs[$i];
@@ -190,31 +190,10 @@ class AddPageByFormPlugin extends Plugin
                                 Folder::create($path);
                             }
                         }
-                        $parent = $parent . DS . $subroute;
                     }
                     
                     $parentPagePath = $path;
                     $parentPageRoute = $route;
-
-                    // Get all form fields of type 'file' 
-                    $uploads = $this->uploads;
-                    foreach ($uploads as $key => $upload) {
-                        foreach ($upload as $key => $files) {
-                            $filefields[$key] = array();
-                            $i = 0;
-                            foreach ($files as $destination => $file) {
-                                $filefields[$key][$i] = '';
-                                foreach ($file as $property => $value) {
-                                    if ($property != 'tmp_name') {
-                                        $filefields[$key][$i][$property] = $value;
-                                    }
-                                }
-                                $filePath = $filefields[$key][$i]['path'];
-                                $filefields[$key][$i]['path'] = substr($filePath, 0, strrpos($filePath, DS));
-                                $i++;
-                            }
-                        }
-                    }
 
                     // Extract the content; if not present as a form value then fallback to frontmatter
                     $content = 'No content set';
@@ -238,9 +217,7 @@ class AddPageByFormPlugin extends Plugin
                         if (isset($formdata)) {
                             $pagefrontmatter = array_merge($pagefrontmatter, $formdata);
                         }
-                        if (isset($filefields)) {
-                            $pagefrontmatter = array_merge($pagefrontmatter, $filefields);
-                        }
+                        
                         // Override overwrite mode (assume a checkbox field)
                         if (isset($formdata['overwrite']) ) {
                             $overwrite = ((string)$formdata['overwrite'] === '1');
@@ -254,7 +231,11 @@ class AddPageByFormPlugin extends Plugin
                         $pagefrontmatter['parent'] = $parentPageRoute;
                         $pagefrontmatter['overwrite'] = $overwrite;
                         if ($addUsername) {
-                            $pagefrontmatter['username'] = $this->grav['session']->user->username;
+                            $username = $this->grav['session']->user->username;
+                            if (is_null($username)) {
+                                $username ='';
+                            }
+                            $pagefrontmatter['username'] = $username;
                         }
 
                         /* Here you can insert anything else into the new page frontmatter
@@ -287,7 +268,7 @@ class AddPageByFormPlugin extends Plugin
                             $slug = $slug . '-' . $version;
                         }
                     }
-                    
+
                     // Create and add the page to Grav
                     try {
                         /** @var Pages $pages */
@@ -306,38 +287,64 @@ class AddPageByFormPlugin extends Plugin
                         $path = $parentPagePath . DS . $slug. DS . $page->name();
                         $page->filePath($path);
                         $page->route($this->newPageRoute);
-                        $header = $pagefrontmatter;
-                        $page->header((object)$header);
-                        $page->frontmatter(Yaml::dump((array)$page->header()));
                         $page->rawMarkdown((string) $content);
                         $page->content((string) $content);
                         $page->file()->markdown($page->rawMarkdown());
+
                         // Actual page file save
                         $page->save();
+
                         // Add page to Pages object with routing info
                         $pages->addPage($page, $path);
 
                         // Move uploaded files to the new page folder
+                        // and prepare uploaded file properties
                         if ($this->moveSelfFiles) {
                             $uploads = $this->uploads;
                             foreach ($uploads as $key => $upload) {
                                 foreach ($upload as $key => $files) {
+                                    $filefields[$key] = array();
+                                    $i = 0;
                                     foreach ($files as $destination => $file) {
-                                        $filename = substr($destination, strrpos($destination, DS) + 1);
+                                        $foldername = substr($destination, strrpos($destination, DS) + 1);
                                         $destination = $file['path'];
                                         $tmp_name = $file['tmp_name'];
-                                        if (strpos($destination, 'user/pages/' . $folder) !== false) {
-                                            // Destiniation is '@self'
-                                            $destinationFilePath = $parentPagePath . DS . $slug . DS . $filename;
+                                        if (strpos($destination, $formPageRelativePagePath) !== false) {
+                                            // Destination points to this form page
+                                            // Assume this is caused by "destination: @self"
+                                            // Change destination to point to the new page
+                                            $destinationFilePath = $parentPagePath . DS . $slug . DS . $foldername;
                                         }
                                         else {
                                             $destinationFilePath = ROOT_DIR . $destination;
                                         }
                                         rename($tmp_name, $destinationFilePath);
+                                        $filefields[$key][$i] = '';
+                                        foreach ($file as $property => $value) {
+                                            if ($property != 'tmp_name') {
+                                                $filefields[$key][$i][$property] = $value;
+                                            }
+                                        }
+                                        // (Re)Set file path starting at the root folder
+                                        $filefields[$key][$i]['path'] = str_replace(rtrim(ROOT_DIR, DS), '', $destinationFilePath);
+                                        $i++;
                                     }
                                 }
                             }
                         }
+
+                        // Add uploaded file properties to frontmatter
+                        if (isset($filefields) && isset($pagefrontmatter)) {
+                            $pagefrontmatter = array_merge($pagefrontmatter, $filefields);
+                        }
+
+                        // Add frontmatter to the page header
+                        $header = $pagefrontmatter;
+                        $page->header((object)$header);
+                        $page->frontmatter(Yaml::dump((array)$page->header()));
+
+                        // Update the new page
+                        $page->save();
                     }
                     catch (\Exception $e) {
                         $this->grav['debugger']->addMessage($e->getMessage());
@@ -361,7 +368,7 @@ class AddPageByFormPlugin extends Plugin
                     /** @var Pages $pages */
                     $pages = $this->grav['pages'];
                     $page = $pages->dispatch($route, false);
-                    // Redirect to the added page
+                    // Redirect to the new page
                     unset($this->grav['page']);
                     $this->grav['page'] = $page;
                     $this->grav->redirect($route);
