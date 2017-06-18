@@ -105,7 +105,6 @@ pageconfig:
     parent: '/assignments/cmpt363-e100/drafts'
 pagefrontmatter:
     visible: true
-    template: draft_assignment    MAKE TEMPLATE !!! DOCUMENT IT
     status: draft
     course:
         assignment: 'CMPT363 E100'
@@ -124,11 +123,10 @@ form:
             name: title
             label: 'Title'
             type: text
-            default: pagefrontmatter.course.assignment
             validate:
                 required: true
         -
-            name: striptags@.content
+            name: content
             label: 'Assignment text'
             type: textarea
             size: long
@@ -143,6 +141,8 @@ form:
             destination: '@self'
             accept:
                 - 'image/*'
+            validate:
+                required: false
         -
             name: additional_images
             label: Additional images
@@ -151,6 +151,8 @@ form:
             destination: '@self'
             accept:
                 - 'image/*'
+            validate:
+                required: false
         -
             name: attachments
             label: Attachments (PDF only)
@@ -159,6 +161,8 @@ form:
             destination: '@self'
             accept:
                 - application/pdf
+            validate:
+                required: false
         -
             name: honeypot
             type: honeypot
@@ -170,12 +174,12 @@ form:
         -
             addpage: null
         -
-            display: '@self'
+            redirect: '@self'
 ---
 
 Please write your assignment and attach any images and/or files.
 ```
-Supposing the user has not changed the pre filled title field, has entered his name "Paul Walker", as the assignment content a simple "q.e.d." and uploaded some images plus a PDF document, the full new page will be:
+Supposing the user has not changed the pre filled title field, has entered his name "Paul Walker", has entered a simple "q.e.d." as the assignment content and uploaded one PDF document, then the full new page will be:
 
 ```
 ---
@@ -187,31 +191,12 @@ instructor:
     name: 'Jane Doe'
 name: 'Paul Walker'
 title: 'CMPT363 E100'
-parent: /repository/add-new-article
-overwrite: false
-main_image:
-    -
-        name: _cute_cat.jpg
-        type: image/jpeg
-        size: 443230
-        path: /user/pages/02.add-new-article/add-new-article/cmpt363-e100-1/_cute_cat.jpg
-additional_images:
-    -
-        name: _vlinder.jpg
-        type: image/jpeg
-        size: 261617
-        path: /user/pages/02.add-new-article/add-new-article/cmpt363-e100-1/_vlinder.jpg
-    -
-        name: anonymous_pic.jpeg
-        type: image/jpeg
-        size: 3996
-        path: /user/pages/02.add-new-article/add-new-article/cmpt363-e100-1/anonymous_pic.jpeg
 attachments:
     -
         name: scrum-guide-sept-2013.pdf
         type: application/pdf
         size: 279642
-        path: /user/pages/02.add-new-article/add-new-article/cmpt363-e100-1/scrum-guide-sept-2013.pdf
+        path: /user/pages/assignments/cmpt363-e100/drafts/cmpt363-e100-1/scrum-guide-sept-2013.pdf
 ---
 
 q.e.d.
@@ -228,9 +213,9 @@ On the file system level the file structure will be:
    cmpt363-e100/
 		default.md
 		drafts/
-			ux-research-gmail/
+			cmpt363-e100-1/
 				default.md
-				screenshot-2017-05-14-1556.jpg
+				scrum-guide-sept-2013.pdf
 			modular.md
 		reviewed/
 			modular.md
