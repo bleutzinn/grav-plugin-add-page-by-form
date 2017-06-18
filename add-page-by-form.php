@@ -289,7 +289,10 @@ class AddPageByFormPlugin extends Plugin
 
                     // Add username (or not)
                     if ($include_username) {
-                        $username = $this->grav['session']->user->username;
+                        $username = null;
+                        if (!is_null($this->grav['session']->user)) {
+                            $username = $this->grav['session']->user->username;
+                        }
                         if (is_null($username)) {
                             $username ='';
                         }
