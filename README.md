@@ -94,6 +94,8 @@ Suppose this minimal Grav website structure in `user/pages/`:
 			modular.md
 ```
 
+BTW both modular pages are not required but are mentioned as they could be used to display a collection of draft and reviewed assignments.
+
 Then the 'Submit article for review' page (with slug `add-new-article`) full content (both frontmatter and content) could look like:
 
 ```
