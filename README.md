@@ -327,7 +327,7 @@ The difference between parent and subroute worded in another way:
 - Subroute: works on a folder level; a subroute may consist of empty folders and if a folder in the subroute does not exist it gets created. 
 
 #### username
-By passing on the username to the new page (by setting `username: true`) it is, for example, possible for users to edit their own pages in the frontend later on. One way of allowing that is to use the [Editable Plugin](https://github.com/bleutzinn/grav-plugin-editable) with the [SimpleMDE editor add-on](https://github.com/bleutzinn/editable-simplemde-add-on).
+The currently logged in frontend user's username can be included in the new page frontmatter by setting `username: true`.
 
 ### 'pagefrontmatter' block frontmatter
 The content of the optional `pagefrontmatter` block will be included in the new page frontmatter.
