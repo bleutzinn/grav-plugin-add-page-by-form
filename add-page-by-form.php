@@ -592,17 +592,7 @@ class AddPageByFormPlugin extends Plugin
         // Enable the events we are interested in
         $this->enable([
             'onPageInitialized' => ['onPageInitialized', 0],
-            'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
         ]);
-    }
-
-    /**
-     * Add current directory to Twig lookup paths.
-     */
-    public function onTwigTemplatePaths()
-    {
-        // Add local templates folder to the Twig templates search path
-        $this->grav['twig']->twig_paths[] = __DIR__ . DS . 'templates';
     }
 
     /**
