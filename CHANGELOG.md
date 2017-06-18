@@ -3,8 +3,8 @@
 
 1. [](#new)
     * Added support for multiple textarea editors ([issue #21](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues/21))
-    * Added support for `process.display: @self` ([issue #23](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues/23))
-    * Added the `overwrite` configuration frontmatter variable
+    * Added support for `process.redirect: @self` ([issue #23](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues/23))
+    * Added the `overwrite_mode` configuration frontmatter variable
     * Added the `subroute` configuration frontmatter variable
     * Added the `slug_field` configuration frontmatter variable 
     * Added filename sanitizing of uploaded files
