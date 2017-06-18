@@ -43,7 +43,7 @@ The next settings are also available from the Adminstration Panel:
 
 - `default_title` will be used as a fallback for the new page title when no other value is set;
 - `default_content` will be used as the page content for the new page when no other value is set;
-- `include_username` when set to `true` the logged in front-end user username is added to the new page frontmatter;
+- `include_username` when set to `true` the logged in frontend user username is added to the new page frontmatter;
 - `overwrite_mode` if `true` the new page will replace a page by the same name or slug if it exists. Both page content and media will be overwritten.
 
 ### Configuration Changes
@@ -315,8 +315,8 @@ In the optional pageconfig block you can set these, and only these, variables (o
 - `parent` sets the parent page for the new page. This variable may be an absolute route (for example `parent: /user_contributions`) or a relative route (e.g. `parent: articles`. In case of an absolute route this route starts from the pages root. A relative route is regarded to start from the form page, so the new page will be a child page of the form page. The form page is also used as the parent page when the set parent page does not exist;
 - `subroute` defines a route from the (initial) parent value. If one or more folders in the route do not exist they will be created;
 - `slug_field` tells the plugin what field to use as the new page's slug or folder name. When `slug_field` is missing the plugin tries to use the value of `title`;
-- `overwrite: true|false` (default false) tells the plugin what to do when a page with the same name already exists. With `overwrite: true` the existing page is overwritten. Any additional files besides the page itself which are stored in the existing page folder are deleted as well. With `overwite: false` the new page slug gets a sequential number attached at the end (for example "my-new-page-1" in case "my-new-page" exists);
-- `username: true|false` (default false) determines whether or not to include the username of a logged in front-end user in the new page frontmatter.
+- `overwrite_mode: true|false` (default false) tells the plugin what to do when a page with the same name already exists. With `overwrite_mode: true` the existing page is overwritten. Any additional files besides the page itself which are stored in the existing page folder are deleted as well. With `overwite_mode: false` the new page slug gets a sequential number attached at the end (for example "my-new-page-1" in case "my-new-page" exists);
+- `username: true|false` (default false) determines whether or not to include the username of a logged in frontend user in the new page frontmatter.
 
 #### parent and subroute
 Together the variables `parent` and `subroute` define the new page's destination. Or, in other words, together they set the path or route of the new page filesystem folder in the page structure.
@@ -327,7 +327,7 @@ The difference between parent and subroute worded in another way:
 - Subroute: works on a folder level; a subroute may consist of empty folders and if a folder in the subroute does not exist it gets created. 
 
 #### username
-By passing on the username to the new page (by setting `username: true`) it is, for example, possible for users to edit their own pages in the front-end later on. One way of allowing that is to use the [Editable Plugin](https://github.com/bleutzinn/grav-plugin-editable) with the [SimpleMDE editor add-on](https://github.com/bleutzinn/editable-simplemde-add-on).
+By passing on the username to the new page (by setting `username: true`) it is, for example, possible for users to edit their own pages in the frontend later on. One way of allowing that is to use the [Editable Plugin](https://github.com/bleutzinn/grav-plugin-editable) with the [SimpleMDE editor add-on](https://github.com/bleutzinn/editable-simplemde-add-on).
 
 ### 'pagefrontmatter' block frontmatter
 The content of the optional `pagefrontmatter` block will be included in the new page frontmatter.
