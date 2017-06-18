@@ -5,7 +5,6 @@ use Grav\Common\Grav;
 use Grav\Common\Plugin;
 use Grav\Common\Uri;
 use Grav\Common\Filesystem\Folder;
-//use Grav\Common\Page\Header;
 use Grav\Common\Page\Page;
 use RocketTheme\Toolbox\Event\Event;
 use RocketTheme\Toolbox\File\File;
@@ -117,26 +116,6 @@ class AddPageByFormPlugin extends Plugin
             Folder::create($path . DS . $folder_name);
         }
         return $folder_name;
-    }
-
-    /**
-     * Get deepest value of an array
-     *
-     * @param array $element
-     *
-     * @return object $leafs
-     */
-    public function getLeaf($element)
-    {
-        $leafs = array();
-        foreach ($element as $e) {
-            if (is_array($e)) {
-                $leafs = array_merge($leafs, $this->getLeaf($e));
-            } else {
-                $leafs[] = $e;
-            }
-        }
-        return $leafs;
     }
 
     /**
