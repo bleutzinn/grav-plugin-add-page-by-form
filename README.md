@@ -81,11 +81,9 @@ The goal of this example is to show how to let a user create a new page where up
 Suppose this minimal Grav website structure in `user/pages/`:
 
 ```
-01.home/
+03.submit-assignment/
 	default.md
-02.add-new-article/
-	default.md
-03.assignments/
+04.assignments/
    cmpt363-e100/
 		default.md
 		drafts/
@@ -96,11 +94,11 @@ Suppose this minimal Grav website structure in `user/pages/`:
 
 BTW both modular pages are not required but are mentioned as they could be used to display a collection of draft and reviewed assignments.
 
-Then the 'Submit article for review' page (with slug `add-new-article`) full content (both frontmatter and content) could look like:
+Then the 'Submit assignment for review' page (with slug `submit-assignment`) full content (both frontmatter and content) could look like:
 
 ```
 ---
-title: 'Submit article for review'
+title: 'Submit assignment for review'
 template: form
 visible: true
 pageconfig:
@@ -249,13 +247,14 @@ form:
             name: nice@.author
             label: 'Author'
             type: text
-            default: grav.user.fullname
             validate:
                 required: true
         -
             name: title
             label: 'Post Title'
             type: text
+            validate:
+                required: true
         -
             name: content
             label: 'Post Content'
@@ -263,6 +262,8 @@ form:
             size: long
             classes: editor
             size: long
+            validate:
+                required: true
         -
             name: images
             label: 'Images to upload'
@@ -271,6 +272,8 @@ form:
             accept:
                 - 'image/*'
             destination: '@self'
+            validate:
+                required: false
         -
             name: honeypot
             type: honeypot
@@ -282,8 +285,10 @@ form:
         -
             addpage: null
         -
-            display: '/blog'
+            redirect: '/blog'
 ---
+
+## New Blog Post
 
 Write your blog post:
 
