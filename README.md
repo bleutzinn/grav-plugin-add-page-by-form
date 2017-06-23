@@ -98,14 +98,16 @@ Then the 'Submit assignment for review' page (with slug `submit-assignment`) ful
 
 ```
 ---
+routable: true
 title: 'Submit assignment for review'
 template: form
 visible: true
 pageconfig:
-    parent: '/assignments/cmpt363-e100/drafts'
+    parent: /submitted-assignments/cmpt363-e100/drafts
 pagefrontmatter:
     visible: true
     status: draft
+    template: assignment
     course:
         assignment: 'CMPT363 E100'
     instructor:
@@ -115,13 +117,13 @@ form:
     fields:
         -
             name: name
-            label: 'Name'
+            label: Name
             type: text
             validate:
                 required: true
         -
             name: title
-            label: 'Title'
+            label: Title
             type: text
             validate:
                 required: true
@@ -134,28 +136,8 @@ form:
             validate:
                 required: true
         -
-            name: main_image
-            label: Main image
-            type: file
-            multiple: false
-            destination: '@self'
-            accept:
-                - 'image/*'
-            validate:
-                required: false
-        -
-            name: additional_images
-            label: Additional images
-            type: file
-            multiple: true
-            destination: '@self'
-            accept:
-                - 'image/*'
-            validate:
-                required: false
-        -
             name: attachments
-            label: Attachments (PDF only)
+            label: 'Attachment (PDF only)'
             type: file
             multiple: true
             destination: '@self'
@@ -179,6 +161,7 @@ form:
 
 Please write your assignment and attach any images and/or files.
 ```
+
 Supposing the user has not changed the pre filled title field, has entered his name "Paul Walker", has entered a simple "q.e.d." as the assignment content and uploaded one PDF document, then the full new page will be:
 
 ```
@@ -195,7 +178,7 @@ attachments:
     -
         name: scrum-guide-sept-2013.pdf
         type: application/pdf
-        size: 279642
+        size: 273 KB
         path: /user/pages/assignments/cmpt363-e100/drafts/cmpt363-e100-1/scrum-guide-sept-2013.pdf
 ---
 
@@ -244,17 +227,13 @@ form:
     name: addpage.blogpost
     fields:
         -
-            name: nice@.author
+            name: author
             label: 'Author'
             type: text
-            validate:
-                required: true
         -
             name: title
             label: 'Post Title'
             type: text
-            validate:
-                required: true
         -
             name: content
             label: 'Post Content'
@@ -262,8 +241,6 @@ form:
             size: long
             classes: editor
             size: long
-            validate:
-                required: true
         -
             name: images
             label: 'Images to upload'
@@ -272,8 +249,6 @@ form:
             accept:
                 - 'image/*'
             destination: '@self'
-            validate:
-                required: false
         -
             name: honeypot
             type: honeypot
@@ -291,7 +266,6 @@ form:
 ## New Blog Post
 
 Write your blog post:
-
 ```
 After the form has been submitted the user is taken to the blog main page where the new post should show up.
 
