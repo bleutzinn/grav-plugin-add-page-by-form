@@ -271,7 +271,7 @@ After the form has been submitted the user is taken to the blog main page where 
 
 ## Form page Frontmatter
 
-The frontmatter isn the form page and the way it is handled by the plugin is where the flexibility orgininates.
+The frontmatter in the form page and the way it is handled by the plugin is where the flexibility of this plugin orgininates.
 
 The form page frontmatter is diveded into three sections or blocks:
 
