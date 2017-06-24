@@ -1,0 +1,8 @@
+
+.editor-toolbar a.active, .editor-toolbar a:focus {
+  outline: none;
+}
+
+.CodeMirror, .CodeMirror-scroll {
+  min-height: 70px;
+}

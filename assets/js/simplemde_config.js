@@ -1,10 +1,16 @@
 $(function () {
-	$(document).ready(function() {
-		new SimpleMDE({
-			element: document.getElementById("simplemde"),
+	$(".editor").each(function(){
+		var simplemde = new SimpleMDE({
+			element: this,
+			forceSync: true,
+			hideIcons: ["side-by-side", "fullscreen"],
 			spellChecker: false,
-			hideIcons: ["side-by-side", "fullscreen", "image"],
-			forceSync: true
+			toolbar: ["bold", "italic", "heading", "|",
+				"quote", "unordered-list", "ordered-list", "|",
+				"link", "table", "|",
+				"undo", "redo", "|",
+				"preview", "guide"
+			]
 		});
-  });
+	});
 });

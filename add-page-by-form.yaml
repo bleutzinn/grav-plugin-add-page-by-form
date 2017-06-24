@@ -1,2 +1,6 @@
 enabled: true
-dateformat: 'd-m-Y g:ia'
+date_display_format: 'd-m-Y g:ia'
+default_title: 'My New Page'
+default_content: 'No content.'
+overwrite_mode: false
+include_username: false
