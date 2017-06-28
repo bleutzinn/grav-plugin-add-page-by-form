@@ -74,6 +74,10 @@ The basic method of modifying is overriding or replacing an initial value. An ex
 ### Page Headers / Frontmatter
 This plugin makes extensive use of [Custom Page Headers](https://learn.getgrav.org/content/headers#custom-page-headers). The Grav documentation mixes the terms "frontmatter", "page headers" and simply "headers". This may be confusing at first. They [all](https://learn.getgrav.org/content/headers) refer to the optional top part of a Grav page which contains data in [YAML syntax](https://learn.getgrav.org/advanced/yaml).
 
+## Examples
+
+The least error prone way to test and play with the examples is to set up a fresh Grav site and using it's default theme Antimatter.
+
 ### Form page example 1: create a normal page
 
 The goal of this example is to show how to let a user create a new page where uploaded images and files are saved along the page (in the same folder). After the user clicked Submit he or she will be shown the new page.
@@ -207,7 +211,7 @@ On the file system level the file structure will be:
 
 ### Form page example 2: create a blog post
 
-In this example the user can add a blog post. To ensure the new page will be treated as a blog post simply set the `template` variable to `item` (assuming the theme in use includes that template):
+In this example the user can add a blog post. To ensure the new page will be treated as a blog post simply set the `template` variable to be used by the new page to `item`. BTW the active theme must include the corresponding template `item.html.twig`. This is why it is best to start with Grav's default theme Antimatter.
 
 ```
 ---
@@ -271,7 +275,7 @@ After the form has been submitted the user is taken to the blog main page where 
 
 ## Form page Frontmatter
 
-The frontmatter isn the form page and the way it is handled by the plugin is where the flexibility orgininates.
+The frontmatter in the form page and the way it is handled by the plugin is where the flexibility of this plugin orgininates.
 
 The form page frontmatter is diveded into three sections or blocks:
 
