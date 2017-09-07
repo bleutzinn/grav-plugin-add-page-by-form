@@ -450,15 +450,19 @@ class AddPageByFormPlugin extends Plugin
 
                         $file_fields = $this->moveFiles($form_page_relative_page_path, $parent_page_path, $slug);
 
-                        // Process category and tags
+                        // Process category, tags, and author
                         if($page_frontmatter['category']) {
-                            $page_frontmatter['taxonomy']['category'] = $page_frontmatter['category'];
+                            $cats = str_replace(' ', '-', strtolower($page_frontmatter['category']));
+                            $page_frontmatter['taxonomy']['category'] = $cats;
                             unset($page_frontmatter['category']);
-                        }
 
-                        if($page_frontmatter['tags']){
-                            $page_frontmatter['taxonomy']['tags'] = '['.$page_frontmatter['tags'].']';
+                        if($page_frontmatter['tags']) {
+                            $tags = str_replace(' ', '-', strtolower($page_frontmatter['tags']));
+                            $page_frontmatter['taxonomy']['tags'] = '['.$tags.']';
                             unset($page_frontmatter['tags']);
+
+                        if($page_frontmatter['author']) {
+                            $page_frontmatter['taxonomy']['author'] = '\''.$page_frontmatter['author'].'\'';
                         }
 
                         // Add uploaded file properties to frontmatter
