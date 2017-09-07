@@ -450,6 +450,17 @@ class AddPageByFormPlugin extends Plugin
 
                         $file_fields = $this->moveFiles($form_page_relative_page_path, $parent_page_path, $slug);
 
+                        // Process category and tags
+                        if($page_frontmatter['category']) {
+                            $page_frontmatter['taxonomy']['category'] = $page_frontmatter['category'];
+                            unset($page_frontmatter['category']);
+                        }
+
+                        if($page_frontmatter['tags']){
+                            $page_frontmatter['taxonomy']['tags'] = '['.$page_frontmatter['tags'].']';
+                            unset($page_frontmatter['tags']);
+                        }
+
                         // Add uploaded file properties to frontmatter
                         if (isset($file_fields) && isset($page_frontmatter)) {
                             $page_frontmatter = array_merge($page_frontmatter, $file_fields);
