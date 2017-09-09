@@ -1,6 +1,6 @@
 name: Add Page By Form
-version: 2.0.0-beta
-testing: true
+version: 2.1
+testing: false
 description: Adds a page by means of a form
 icon: plus-square-o
 author:
