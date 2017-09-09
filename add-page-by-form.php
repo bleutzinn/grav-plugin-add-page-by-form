@@ -307,16 +307,49 @@ class AddPageByFormPlugin extends Plugin
 
                     */
 
-
                     // Get all form field values
                     $form_data = $form->value()->toArray();
                     if (isset($form_data)) {
+
+                        // Append taxonomy
+                        dump($form_data);
+                        if (isset($form_data['taxonomy']) && is_array($form_data['taxonomy'])) {
+                            // Convert comma separated list into array assuming double quoted items
+                            foreach ($form_data['taxonomy'] as $key => $value) {
+                                $values = str_getcsv($value, ',', '"');
+                                foreach ($values as $k => $v) {
+                                    $values[$k] = trim($v);
+                                }
+                                $form_data['taxonomy'][$key] = $values;
+                            }
+                            if (isset($page_frontmatter['taxonomy'])) {
+                                // Append type/values
+                                $page_frontmatter['taxonomy'] = array_merge_recursive($page_frontmatter['taxonomy'], $form_data['taxonomy']);
+                                // Remove duplicate values
+                                foreach ($page_frontmatter['taxonomy'] as $key => $value) {
+                                    if (is_array($page_frontmatter['taxonomy'][$key])) {
+                                        $page_frontmatter['taxonomy'][$key] = array_keys(array_flip($page_frontmatter['taxonomy'][$key]));
+                                    }
+                                }
+                            }
+                            else {
+                                // Add taxonomy, types and values
+                                $page_frontmatter['taxonomy'] = $form_data['taxonomy'];
+                            }
+                            // Remove taxonomy from form data (to prevent merging raw data)
+                            unset($form_data['taxonomy']);
+                        }
 
                         // Merge variables from pagefrontmatter block and form fields;
                         // Values that have been through a Twig Processor are in the
                         // page_frontmatter and take precedence over the form values
                         $page_frontmatter = array_merge($page_frontmatter, $form_data);
+                        //dump($page_frontmatter);exit;
                     }
+
+
+
+
 
                     // If content is not included as a form value then fallback to config default
                     if (isset($page_frontmatter['content']) ) {
@@ -450,6 +483,30 @@ class AddPageByFormPlugin extends Plugin
 
                         $file_fields = $this->moveFiles($form_page_relative_page_path, $parent_page_path, $slug);
 
+                        // Process category, tags, and author
+                        if(isset($page_frontmatter['category'])) {
+                            $cats = str_replace(' ', '-', strtolower($page_frontmatter['category']));
+                            $page_frontmatter['taxonomy']['category'] = $cats;
+                            unset($page_frontmatter['category']);
+                        }
+
+                        if(isset($page_frontmatter['tags'])) {
+                            $tags = str_replace(' ', '-', strtolower($page_frontmatter['tags']));
+                            $page_frontmatter['taxonomy']['tags'] = '['.$tags.']';
+                            unset($page_frontmatter['tags']);
+                        }
+
+                        if(isset($page_frontmatter['author'])) {
+                            $page_frontmatter['taxonomy']['author'] = '\''.$page_frontmatter['author'].'\'';
+                        }
+/*
+Problems:
+    should check for the presence of each field by using isset()
+    the code overwrites any existing taxonomy values as set in the Pagefrontmatter block instead of adding values to them
+    Grav defines two default taxonomy types namely `category` and `tag` in the default site.yaml file. So using `tags` requires the admin to define an extra custom taxonomy type before your code can act on it. This is undesired. 
+    Please follow the PHP Standards Recommendations PSR-1 and PSR-2.
+
+*/
                         // Add uploaded file properties to frontmatter
                         if (isset($file_fields) && isset($page_frontmatter)) {
                             $page_frontmatter = array_merge($page_frontmatter, $file_fields);
