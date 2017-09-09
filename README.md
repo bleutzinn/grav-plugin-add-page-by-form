@@ -275,18 +275,18 @@ After the form has been submitted the user is taken to the blog main page where 
 
 ## Form page Frontmatter
 
-The frontmatter in the form page and the way it is handled by the plugin is where the flexibility of this plugin orgininates.
+The frontmatter in the form page and the way it is handled by the plugin is where the flexibility of this plugin originates.
 
-The form page frontmatter is diveded into three sections or blocks:
+The form page frontmatter is divided into three sections or blocks:
 
 1. So called 'root level' variables are intended to act upon the form page itself. They are not passed on to the new page;
-2. the `pageconfig` block contains variables that are used by the plugin in the new page creation process and are also passed on to the new page frontmatter;
-3. the `pagefrontmatter` block holds all variables that are to be passed on to the new page frontmatter.
+2. the `pageconfig` block contains variables that are used by the plugin in the new page creation process and do get passed on to the new page frontmatter;
+3. the `pagefrontmatter` block holds all other variables that must be passed on to the new page frontmatter.
 
 ### Root level frontmatter
 In the examples above the root level configuration options are:
 
-- `title` sets the title of the page containg the form;
+- `title` sets the title of the page containing the form;
 - `template: form` activates the form on this page (not required when the form page is named `form.md`);
 - `form` defines the form.
 
@@ -298,7 +298,7 @@ In the optional pageconfig block you can set these, and only these, variables (o
 - `parent` sets the parent page for the new page. This variable may be an absolute route (for example `parent: /user_contributions`) or a relative route (e.g. `parent: articles`. In case of an absolute route this route starts from the pages root. A relative route is regarded to start from the form page, so the new page will be a child page of the form page. The form page is also used as the parent page when the set parent page does not exist;
 - `subroute` defines a route from the (initial) parent value. If one or more folders in the route do not exist they will be created;
 - `slug_field` tells the plugin what field to use as the new page's slug or folder name. When `slug_field` is missing the plugin tries to use the value of `title`;
-- `overwrite_mode: true|false` (default false) tells the plugin what to do when a page with the same name already exists. With `overwrite_mode: true` the existing page is overwritten. Any additional files besides the page itself which are stored in the existing page folder are deleted as well. With `overwite_mode: false` the new page slug gets a sequential number attached at the end (for example "my-new-page-1" in case "my-new-page" exists);
+- `overwrite_mode: true|false` (default false) tells the plugin what to do when a page with the same name already exists. With `overwrite_mode: true` the existing page is overwritten. Any additional (media) files besides the page itself which are stored in the existing page folder are deleted as well. With `overwite_mode: false` the new page slug gets a sequential number attached at the end (for example "my-new-page-1" in case "my-new-page" exists);
 - `username: true|false` (default false) determines whether or not to include the username of a logged in frontend user in the new page frontmatter.
 
 #### parent and subroute
@@ -365,13 +365,13 @@ To show the new page to the user set the `redirect` action to the custom value `
 ``` 
 
 ### Using a Markdown editor in textarea fields
-When a `textarea` field is given the class `editor` it will use the [SimpleMDE Markdown Editor](https://github.com/NextStepWebs/simplemde-markdown-editor).
+When a `textarea` field is given the class `editor` it will use the [SimpleMDE Markdown Editor](https://simplemde.com).
 
 ## Grav Form issue
 
-The form on the form page is a standard Grav form. Please note that the Grav Form Plugin currently (version 2.7.0) has an issue which prevents the form to be submitted when a form field ot type `file` is set to `required: true`(see issue [#106](https://github.com/getgrav/grav-plugin-form/issues/106)).
+The form on the form page is a standard Grav form. Please note that the Grav Form Plugin currently (version 2.9.0) has an issue which prevents the form to be submitted when a form field of type `file` is set to `required: true`(see issue [#106](https://github.com/getgrav/grav-plugin-form/issues/106)).
 
 ## Credits
 
 - Team Grav and everyone who contributes to Grav;
-- Wes Cossick for [SimpleMDE Markdown Editor](https://github.com/NextStepWebs/simplemde-markdown-editor).
+- Wes Cossick for [SimpleMDE Markdown Editor](https://simplemde.com).
