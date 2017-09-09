@@ -491,6 +491,19 @@ class AddPageByFormPlugin extends Plugin
                         $this->page_frontmatter = $page_frontmatter;
                         $new_page->header((object)$header);
 
+                        $taxonomy_config = (array)$this->config->get('site.taxonomies');
+                        foreach(array_keys($page_frontmatter['taxonomy']) as $type) {
+                            $taxonomy_config = array_merge($taxonomy_config, (array)$type);
+                        }
+                        
+                        // Persistently save extra taxonomy types in site.yaml
+                        // Not working yet !
+                        $this->config->set('site.taxonomies', $taxonomy_config);
+                        $this->config->save();
+
+                        $new_page->taxonomy($page_frontmatter['taxonomy']);
+                        $this->grav['taxonomy']->addTaxonomy($new_page);
+
                         // Update the new page
                         $new_page->save();
 

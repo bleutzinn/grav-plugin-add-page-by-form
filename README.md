@@ -173,17 +173,17 @@ Supposing the user has not changed the pre filled title field, has entered his n
 visible: true
 status: draft
 course:
-    assignment: 'CMPT363 E100'
+  assignment: 'CMPT363 E100'
 instructor:
-    name: 'Jane Doe'
+  name: 'Jane Doe'
 name: 'Paul Walker'
 title: 'CMPT363 E100'
 attachments:
-    -
-        name: scrum-guide-sept-2013.pdf
-        type: application/pdf
-        size: 273 KB
-        path: /user/pages/assignments/cmpt363-e100/drafts/cmpt363-e100-1/scrum-guide-sept-2013.pdf
+  -
+    name: scrum-guide-sept-2013.pdf
+    type: application/pdf
+    size: 273 KB
+    path: /user/pages/assignments/cmpt363-e100/drafts/cmpt363-e100-1/scrum-guide-sept-2013.pdf
 ---
 
 q.e.d.
@@ -193,19 +193,19 @@ On the file system level the file structure will be:
 
 ```
 01.home/
-	default.md
+  default.md
 02.add-new-article/
-	default.md
+  default.md
 03.assignments/
-   cmpt363-e100/
-		default.md
-		drafts/
-			cmpt363-e100-1/
-				default.md
-				scrum-guide-sept-2013.pdf
-			modular.md
-		reviewed/
-			modular.md
+  cmpt363-e100/
+    default.md
+    drafts/
+      cmpt363-e100-1/
+        default.md
+        scrum-guide-sept-2013.pdf
+      modular.md
+    reviewed/
+      modular.md
 ```
 
 
@@ -237,6 +237,10 @@ form:
         -
             name: title
             label: 'Post Title'
+            type: text
+        -
+            name: taxonomy.tag
+            label: 'Tags (separate using a comma)'
             type: text
         -
             name: content
@@ -315,12 +319,14 @@ The currently logged in frontend user's username can be included in the new page
 ### 'pagefrontmatter' block frontmatter
 The content of the optional `pagefrontmatter` block will be included in the new page frontmatter.
 
-## Form input overrides
+## Form input
 
-The above variables which are defined and given a value in the `pageconfig` and `pagefrontmatter` blocks may be 'overridden' by form input fields. In that respect these variables can be seen to hold a set of default values.
+The above variables which are defined and given a value in the `pageconfig` and `pagefrontmatter` blocks may be 'overridden' or replaced by form input fields. In that respect these variables can be seen to hold a set of default values.
 
 To overridde a default value by user input is simply a matter of including a form field by the same name in the page form.   
 For example in the example 2 - _create a new blog post_, the default title is set to "My new Blog post". The form contains a form field of type text with `name: title`. Thus the user is prompted to enter a title for the new page in the form but does not need to do so because filling in the title field is not mandatory. If the user enters a title that value is used as the title for the new page. If he or she does not, the default title "My new Blog post" will be used.
+
+There is only one exception to the default variable override behaviour and that is the handling of `taxonomy` types. New or extra taxonomy types and values which are entered via form fields are added to the new page taxonomy.
 
 The passing on of both the default settings and the form field values to the new page frontmatter makes for an extremely configurable solution. By mixing default settings and configuring the page form you can to a large extent control the appearence and behaviour of the newly added page by using the frontmatter variables present in the new page in a Twig template.
 
