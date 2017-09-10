@@ -4,3 +4,4 @@ default_title: 'My New Page'
 default_content: 'No content.'
 overwrite_mode: false
 include_username: false
+auto_taxonomy_types: false

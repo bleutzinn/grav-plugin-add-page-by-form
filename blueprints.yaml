@@ -1,10 +1,5 @@
 name: Add Page By Form
-<<<<<<< HEAD
-version: 2.1
-testing: false
-=======
-version: 2.0.0
->>>>>>> master
+version: 2.1.0
 description: Adds a page by means of a form
 icon: plus-square-o
 author:
@@ -54,6 +49,17 @@ form:
       type: toggle
       label: Overwrite mode
       help: Overwrite existing page
+      highlight: 0
+      default: 0
+      options:
+          1: Enabled
+          0: Disabled
+      validate:
+           type: bool
+    auto_taxonomy_types:
+      type: toggle
+      label: Add new taxonomy types
+      help: Automatically add new taxonomy types to site configuration. May have performance impact on large sites.
       highlight: 0
       default: 0
       options:
