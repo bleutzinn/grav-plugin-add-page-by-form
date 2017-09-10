@@ -8,6 +8,7 @@ use Grav\Common\Filesystem\Folder;
 use Grav\Common\Page\Page;
 use RocketTheme\Toolbox\Event\Event;
 use RocketTheme\Toolbox\File\File;
+use RocketTheme\Toolbox\File\YamlFile;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -491,21 +492,37 @@ class AddPageByFormPlugin extends Plugin
                         $this->page_frontmatter = $page_frontmatter;
                         $new_page->header((object)$header);
 
-                        $taxonomy_config = (array)$this->config->get('site.taxonomies');
-                        foreach(array_keys($page_frontmatter['taxonomy']) as $type) {
-                            $taxonomy_config = array_merge($taxonomy_config, (array)$type);
-                        }
-                        
-                        // Persistently save extra taxonomy types in site.yaml
-                        // Not working yet !
-                        $this->config->set('site.taxonomies', $taxonomy_config);
-                        $this->config->save();
-
-                        $new_page->taxonomy($page_frontmatter['taxonomy']);
-                        $this->grav['taxonomy']->addTaxonomy($new_page);
-
                         // Update the new page
                         $new_page->save();
+
+                        // Process any new taxonomy types
+                        if ($this->config->get('plugins.add-page-by-form.auto_taxonomy_types')) {
+
+                            // Read site configuration
+                            $grav = Grav::instance();
+                            $locator = $grav['locator'];
+                            $filename = 'config://site.yaml';
+                            $file = YamlFile::instance($locator->findResource($filename, true, true));
+                            $site_config = Yaml::parse($file->load());
+
+                            // Merge taxonomy types
+                            $taxonomies = (array)$this->config->get('site.taxonomies');
+                            foreach(array_keys($page_frontmatter['taxonomy']) as $type) {
+                                $taxonomies = array_merge($taxonomies, (array)$type);
+                            }
+
+                            // Don't bother if there are no new taxonomy types
+                            if (count(array_unique($taxonomies)) > count($site_config['taxonomies'])) {
+                                $this->config->set('site.taxonomies', $taxonomies);
+                                $taxonomies_merged = array();
+                                $taxonomies_merged['taxonomies'] = array_values(array_unique($taxonomies));
+                                $site_config = array_merge($site_config, $taxonomies_merged);
+
+                                // Update taxonomy types in site.yaml
+                                $file->save($site_config);
+                                $file->free();
+                            }
+                        }
 
                     }
                     catch (\Exception $e) {
