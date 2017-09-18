@@ -96,14 +96,14 @@ Suppose this minimal Grav website structure in `user/pages/`:
 
 ```
 03.submit-assignment/
-	default.md
+    default.md
 04.assignments/
-   cmpt363-e100/
-		default.md
-		drafts/
-			modular.md
-		reviewed/
-			modular.md
+    cmpt363-e100/
+        default.md
+        drafts/
+            modular.md
+        reviewed/
+            modular.md
 ```
 
 BTW both modular pages are not required but are mentioned as they could be used to display a collection of draft and reviewed assignments.
