@@ -8,6 +8,7 @@ use Grav\Common\Filesystem\Folder;
 use Grav\Common\Page\Page;
 use RocketTheme\Toolbox\Event\Event;
 use RocketTheme\Toolbox\File\File;
+use RocketTheme\Toolbox\File\YamlFile;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -299,6 +300,47 @@ class AddPageByFormPlugin extends Plugin
                         $page_frontmatter['username'] = $username;
                     }
 
+                    // Get all form field values
+                    $form_data = $form->value()->toArray();
+                    if (isset($form_data)) {
+
+                        // Append taxonomy
+                        dump($form_data);
+                        if (isset($form_data['taxonomy']) && is_array($form_data['taxonomy'])) {
+                            // Convert comma separated list into array assuming double quoted items
+                            foreach ($form_data['taxonomy'] as $key => $value) {
+                                $values = str_getcsv($value, ',', '"');
+                                foreach ($values as $k => $v) {
+                                    $values[$k] = trim($v);
+                                }
+                                $form_data['taxonomy'][$key] = $values;
+                            }
+                            if (isset($page_frontmatter['taxonomy'])) {
+                                // Append type/values
+                                $page_frontmatter['taxonomy'] = array_merge_recursive($page_frontmatter['taxonomy'], $form_data['taxonomy']);
+                                // Remove duplicate values
+                                foreach ($page_frontmatter['taxonomy'] as $key => $value) {
+                                    if (is_array($page_frontmatter['taxonomy'][$key])) {
+                                        $page_frontmatter['taxonomy'][$key] = array_keys(array_flip($page_frontmatter['taxonomy'][$key]));
+                                    }
+                                }
+                            }
+                            else {
+                                // Add taxonomy, types and values
+                                $page_frontmatter['taxonomy'] = $form_data['taxonomy'];
+                            }
+                            // Remove taxonomy from form data (to prevent merging raw data)
+                            unset($form_data['taxonomy']);
+                        }
+
+                        // Merge variables from pagefrontmatter block and form fields;
+                        // Values that have been through a Twig Processor are in the
+                        // page_frontmatter and take precedence over the form values
+                        $page_frontmatter = array_merge($page_frontmatter, $form_data);
+                        //dump($page_frontmatter);exit;
+                    }
+
+
                     // Here you can insert anything else into the new page frontmatter
                     /*
 
@@ -307,16 +349,6 @@ class AddPageByFormPlugin extends Plugin
 
                     */
 
-
-                    // Get all form field values
-                    $form_data = $form->value()->toArray();
-                    if (isset($form_data)) {
-
-                        // Merge variables from pagefrontmatter block and form fields;
-                        // Values that have been through a Twig Processor are in the
-                        // page_frontmatter and take precedence over the form values
-                        $page_frontmatter = array_merge($page_frontmatter, $form_data);
-                    }
 
                     // If content is not included as a form value then fallback to config default
                     if (isset($page_frontmatter['content']) ) {
@@ -462,6 +494,35 @@ class AddPageByFormPlugin extends Plugin
 
                         // Update the new page
                         $new_page->save();
+
+                        // Process any new taxonomy types
+                        if ($this->config->get('plugins.add-page-by-form.auto_taxonomy_types')) {
+
+                            // Read site configuration
+                            $grav = Grav::instance();
+                            $locator = $grav['locator'];
+                            $filename = 'config://site.yaml';
+                            $file = YamlFile::instance($locator->findResource($filename, true, true));
+                            $site_config = Yaml::parse($file->load());
+
+                            // Merge taxonomy types
+                            $taxonomies = (array)$this->config->get('site.taxonomies');
+                            foreach(array_keys($page_frontmatter['taxonomy']) as $type) {
+                                $taxonomies = array_merge($taxonomies, (array)$type);
+                            }
+
+                            // Don't bother if there are no new taxonomy types
+                            if (count(array_unique($taxonomies)) > count($site_config['taxonomies'])) {
+                                $this->config->set('site.taxonomies', $taxonomies);
+                                $taxonomies_merged = array();
+                                $taxonomies_merged['taxonomies'] = array_values(array_unique($taxonomies));
+                                $site_config = array_merge($site_config, $taxonomies_merged);
+
+                                // Update taxonomy types in site.yaml
+                                $file->save($site_config);
+                                $file->free();
+                            }
+                        }
 
                     }
                     catch (\Exception $e) {
