@@ -1,3 +1,9 @@
+# v2.1.0
+##  09/18/2017
+
+1. [](#new)
+    * Added support for taxonomy types and tags
+
 # v2.0.0
 ##  06/18/2017
 
