@@ -496,7 +496,7 @@ class AddPageByFormPlugin extends Plugin
                         $new_page->save();
 
                         // Process any new taxonomy types
-                        if ($auto_taxonomy_types) {
+                        if ($auto_taxonomy_types && isset($page_frontmatter['taxonomy'])) {
 
                             // Read site configuration
                             $grav = Grav::instance();
