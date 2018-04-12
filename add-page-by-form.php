@@ -207,7 +207,7 @@ class AddPageByFormPlugin extends Plugin
                             $destination_file_path = ROOT_DIR . $destination;
                         }
                         rename($file['tmp_name'], $destination_file_path);
-                        $file_fields[$key][$i] = '';
+                        $file_fields[$key][$i] = array();
                         foreach ($file as $property => $value) {
                             if ($property == 'name') {
                                 $value = $this->sanitize($value);
@@ -249,6 +249,7 @@ class AddPageByFormPlugin extends Plugin
                     $include_username = $this->config->get('plugins.add-page-by-form.include_username');
                     $overwrite_mode = $this->config->get('plugins.add-page-by-form.overwrite_mode');
                     $date_format = $this->config->get('plugins.add-page-by-form.date_display_format');
+                    $auto_taxonomy_types = $this->config->get('plugins.add-page-by-form.auto_taxonomy_types');
                     $slug_field = '';
 
                     // For next plugin version
@@ -305,7 +306,6 @@ class AddPageByFormPlugin extends Plugin
                     if (isset($form_data)) {
 
                         // Append taxonomy
-                        dump($form_data);
                         if (isset($form_data['taxonomy']) && is_array($form_data['taxonomy'])) {
                             // Convert comma separated list into array assuming double quoted items
                             foreach ($form_data['taxonomy'] as $key => $value) {
@@ -496,7 +496,7 @@ class AddPageByFormPlugin extends Plugin
                         $new_page->save();
 
                         // Process any new taxonomy types
-                        if ($this->config->get('plugins.add-page-by-form.auto_taxonomy_types')) {
+                        if ($auto_taxonomy_types && isset($page_frontmatter['taxonomy'])) {
 
                             // Read site configuration
                             $grav = Grav::instance();
