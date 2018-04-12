@@ -19,6 +19,7 @@ class AddPageByFormPlugin extends Plugin
 {
 
     private $new_page_route = '';
+    private $redirect_prefix = '';
     private $move_self_files = false;
     private $say_my_name = 'addpage';
     private $uploads = array();
@@ -251,6 +252,7 @@ class AddPageByFormPlugin extends Plugin
                     $date_format = $this->config->get('plugins.add-page-by-form.date_display_format');
                     $auto_taxonomy_types = $this->config->get('plugins.add-page-by-form.auto_taxonomy_types');
                     $slug_field = '';
+                    $this->redirect_prefix = '';
 
                     // For next plugin version
                     $include_timestamp = false;
@@ -277,6 +279,9 @@ class AddPageByFormPlugin extends Plugin
                         }
                         if ( isset($pageconfig['slug_field']) ) {
                             $slug_field = strtolower(trim($pageconfig['slug_field']));
+                        }
+                        if ( isset($pageconfig['redirect_prefix']) ) {
+                            $this->redirect_prefix = strtolower(trim($pageconfig['redirect_prefix']));
                         }
                     }
 
@@ -550,6 +555,11 @@ class AddPageByFormPlugin extends Plugin
                     /** @var Pages $pages */
                     $pages = $this->grav['pages'];
                     $page = $pages->dispatch($route, false);
+                    
+                    // Insert the redirect_prefix value when set in the pageconfig block
+                    if ($this->redirect_prefix != '') {
+                        $route = DS . $this->redirect_prefix . $this->new_page_route;
+                    }
 
                     // Redirect to the new page
                     unset($this->grav['page']);
