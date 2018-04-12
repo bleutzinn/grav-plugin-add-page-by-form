@@ -1,3 +1,11 @@
+# v2.2.0
+##  04/12/2018
+
+1. [](#new)
+    * Added a new pageconfig variable `redirect_prefix`
+1. [](#improved)
+    * Fixed a problem with uploading files
+
 # v2.1.0
 ##  09/18/2017
 
