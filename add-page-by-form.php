@@ -560,6 +560,7 @@ class AddPageByFormPlugin extends Plugin
                 }
 
                 // Do the redirect
+                // BTW if there is no route the redirect is handed over to the Form plugin
                 if ($route) {
 
                     /** @var Twig $twig */
