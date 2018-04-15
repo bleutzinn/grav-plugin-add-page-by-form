@@ -544,7 +544,7 @@ class AddPageByFormPlugin extends Plugin
                         break;
                     case '@self-admin':
                         $admin_route = $this->config->get('plugins.admin.route');
-                        if ($admin_route) {
+                        if ($admin_route && $this->config->get('plugins.admin.enabled')) {
                             $base = DS . trim($admin_route, DS);
                             $route = $base . DS . 'pages' . $this->new_page_route;
                         }
@@ -555,7 +555,7 @@ class AddPageByFormPlugin extends Plugin
                         }
                         break;
                     default:
-                        // No valid redirect parameter
+                        // No valid redirect to self parameter
                         $route = '';
                 }
 

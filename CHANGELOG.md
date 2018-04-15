@@ -1,8 +1,8 @@
 # v2.2.0
-##  04/12/2018
+##  04/15/2018
 
 1. [](#new)
-    * Added a new pageconfig variable `redirect_prefix`
+    * Added support for `process.redirect: @self-admin` ([issue #13](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues/31))
 1. [](#improved)
     * Fixed a problem with uploading files
 
