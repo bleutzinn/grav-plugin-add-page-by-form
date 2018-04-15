@@ -536,11 +536,32 @@ class AddPageByFormPlugin extends Plugin
                 }
                 break;
             case 'redirect':  // look at Form plugin and mimic behaviour
-                $route = (string)$params;
                 // The Form plugin does not know how to handle '@self' as a redirect
-                // or display parameter, so do the redirect to the new page
-                if (strtolower($route) == '@self') {
-                    $route = $this->new_page_route;
+                // or display parameter, so prepare the redirect to the new page
+                switch (strtolower((string)$params)) {
+                    case '@self':
+                        $route = $this->new_page_route;
+                        break;
+                    case '@self-admin':
+                        $admin_route = $this->config->get('plugins.admin.route');
+                        if ($admin_route && $this->config->get('plugins.admin.enabled')) {
+                            $base = DS . trim($admin_route, DS);
+                            $route = $base . DS . 'pages' . $this->new_page_route;
+                        }
+                        else {
+                            // Admin not installed or inactive
+                            // Fall back to @self
+                            $route = $this->new_page_route;
+                        }
+                        break;
+                    default:
+                        // No valid redirect to self parameter
+                        $route = '';
+                }
+
+                // Do the redirect
+                // BTW if there is no route the redirect is handed over to the Form plugin
+                if ($route) {
 
                     /** @var Twig $twig */
                     $twig = $this->grav['twig'];
@@ -557,7 +578,6 @@ class AddPageByFormPlugin extends Plugin
                     $this->grav->redirect($route);
                 }
                 break;
-
         }
     }
 

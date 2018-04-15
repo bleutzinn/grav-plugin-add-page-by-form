@@ -1,3 +1,11 @@
+# v2.2.0
+##  04/15/2018
+
+1. [](#new)
+    * Added support for `process.redirect: @self-admin` ([issue #13](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues/31))
+1. [](#improved)
+    * Fixed a problem with uploading files
+
 # v2.1.0
 ##  09/18/2017
 
