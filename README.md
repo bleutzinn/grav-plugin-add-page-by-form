@@ -311,8 +311,7 @@ From version 2, the use of `parent` in the, what is now called, root level block
 In the optional pageconfig block you can set these, and only these, variables (other variables will be ignored):
 
 - `parent` sets the parent page for the new page. This variable may be an absolute route (for example `parent: /user_contributions`) or a relative route (e.g. `parent: articles`. In case of an absolute route this route starts from the pages root. A relative route is regarded to start from the form page, so the new page will be a child page of the form page. The form page is also used as the parent page when the set parent page does not exist;
-- `subroute` defines a route from the (initial) parent value. If one or more folders in the route do not exist they will be created;
-- `redirect_prefix` may be used to open the new page in the Admin plugin by setting it to `admin/pages` in a standard Grav setup. Note that the Admin plugin must be installed and enabled; 
+- `subroute` defines a route from the (initial) parent value. If one or more folders in the route do not exist they will be created; 
 - `slug_field` tells the plugin what field to use as the new page's slug or folder name. When `slug_field` is missing the plugin tries to use the value of `title`;
 - `overwrite_mode: true|false` (default false) tells the plugin what to do when a page with the same name already exists. With `overwrite_mode: true` the existing page is overwritten. Any additional (media) files besides the page itself which are stored in the existing page folder are deleted as well. With `overwite_mode: false` the new page slug gets a sequential number attached at the end (for example "my-new-page-1" in case "my-new-page" exists);
 - `username: true|false` (default false) determines whether or not to include the username of a logged in frontend user in the new page frontmatter.
@@ -362,7 +361,10 @@ To let the plugin process the form after a Submit the custom process action must
 
 **Redirect to the new page**
 
-To show the new page to the user set the `redirect` action to the custom value `@self`:
+
+To show the new page to the user set the `redirect` action to the custom value `@self` or '@self-admin`.
+
+When using `redirect: '@self'` the page will be shown as a regular web page, for example:
 
 ```
     process:
@@ -371,6 +373,10 @@ To show the new page to the user set the `redirect` action to the custom value `
         -
             redirect: '@self'
 ``` 
+
+To open the new page in the Admin panel use `redirect: '@self-admin'`. Note that this plugin does not handle the admin user authentication. If the Admin plugin is not installed or is inactive redirection occurs as if `@self` was used.
+
+> Tip: using `@self-admin` is a very convenient way to learn how to use this plugin as it is easy to see the resulting new page frontmatter in the Admin panel.
 
 ### Using a Markdown editor in textarea fields
 When a `textarea` field is given the class `editor` it will use the [SimpleMDE Markdown Editor](https://simplemde.com).
