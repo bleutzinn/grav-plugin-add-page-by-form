@@ -19,7 +19,6 @@ class AddPageByFormPlugin extends Plugin
 {
 
     private $new_page_route = '';
-    private $redirect_prefix = '';
     private $move_self_files = false;
     private $say_my_name = 'addpage';
     private $uploads = array();
@@ -252,7 +251,6 @@ class AddPageByFormPlugin extends Plugin
                     $date_format = $this->config->get('plugins.add-page-by-form.date_display_format');
                     $auto_taxonomy_types = $this->config->get('plugins.add-page-by-form.auto_taxonomy_types');
                     $slug_field = '';
-                    $this->redirect_prefix = '';
 
                     // For next plugin version
                     $include_timestamp = false;
@@ -279,9 +277,6 @@ class AddPageByFormPlugin extends Plugin
                         }
                         if ( isset($pageconfig['slug_field']) ) {
                             $slug_field = strtolower(trim($pageconfig['slug_field']));
-                        }
-                        if ( isset($pageconfig['redirect_prefix']) ) {
-                            $this->redirect_prefix = strtolower(trim($pageconfig['redirect_prefix']));
                         }
                     }
 
@@ -541,11 +536,31 @@ class AddPageByFormPlugin extends Plugin
                 }
                 break;
             case 'redirect':  // look at Form plugin and mimic behaviour
-                $route = (string)$params;
                 // The Form plugin does not know how to handle '@self' as a redirect
-                // or display parameter, so do the redirect to the new page
-                if (strtolower($route) == '@self') {
-                    $route = $this->new_page_route;
+                // or display parameter, so prepare the redirect to the new page
+                switch (strtolower((string)$params)) {
+                    case '@self':
+                        $route = $this->new_page_route;
+                        break;
+                    case '@self-admin':
+                        $admin_route = $this->config->get('plugins.admin.route');
+                        if ($admin_route) {
+                            $base = DS . trim($admin_route, DS);
+                            $route = $base . DS . 'pages' . $this->new_page_route;
+                        }
+                        else {
+                            // Admin not installed or inactive
+                            // Fall back to @self
+                            $route = $this->new_page_route;
+                        }
+                        break;
+                    default:
+                        // No valid redirect parameter
+                        $route = '';
+                }
+
+                // Do the redirect
+                if ($route) {
 
                     /** @var Twig $twig */
                     $twig = $this->grav['twig'];
@@ -555,11 +570,6 @@ class AddPageByFormPlugin extends Plugin
                     /** @var Pages $pages */
                     $pages = $this->grav['pages'];
                     $page = $pages->dispatch($route, false);
-                    
-                    // Insert the redirect_prefix value when set in the pageconfig block
-                    if ($this->redirect_prefix != '') {
-                        $route = DS . $this->redirect_prefix . $this->new_page_route;
-                    }
 
                     // Redirect to the new page
                     unset($this->grav['page']);
@@ -567,7 +577,6 @@ class AddPageByFormPlugin extends Plugin
                     $this->grav->redirect($route);
                 }
                 break;
-
         }
     }
 
