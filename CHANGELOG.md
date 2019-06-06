@@ -1,3 +1,9 @@
+# v2.3.0
+##  06/06/2019
+
+1. [](#bugfix)
+    * Fixed the failure to save file uploads to new page folder (form field File with `destination: @self`) introduced with Grav version 1.6 ([issue #40](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues/40))
+
 # v2.2.0
 ##  04/15/2018
 
