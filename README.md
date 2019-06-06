@@ -258,7 +258,6 @@ form:
             type: textarea
             size: long
             classes: editor
-            size: long
         -
             name: images
             label: 'Images to upload'
@@ -428,9 +427,15 @@ By setting the plugin configuration option `auto_taxonomy_types: true` new types
 The side effect and possibly downside is that every modification of the site configuration file causes Grav to rebuild the cache, so this may not be desirable with larger sites.   
 Use with caution!
 
-## Grav Form issue
+## Issues
 
-The form on the form page is a standard Grav form. Please note that the Grav Form Plugin currently (version 2.9.0) has an issue which prevents the form to be submitted when a form field of type `file` is set to `required: true`(see issue [#106](https://github.com/getgrav/grav-plugin-form/issues/106)).
+### Plugin issue
+
+By setting `destination: @self` uploaded files get saved in the same folder as the new page. Changes in Grav version 1.6 called for some serious trickery to keep this functionality. A clear downside is that the temporary upload folder is not removed. By default such a folder path is "tmp/forms/<session_id>". This issue is yet unresolved.
+
+### Grav Form issue
+
+The form on the form page is a standard Grav form. Please note that the Grav Form Plugin currently (version 3.3.0) has an issue which prevents the form to be submitted when a form field of type `file` is set to `required: true`(see issue [#106](https://github.com/getgrav/grav-plugin-form/issues/106)).
 
 
 ## Credits
