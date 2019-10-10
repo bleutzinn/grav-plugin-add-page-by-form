@@ -90,7 +90,7 @@ class AddPageByFormPlugin extends Plugin
                 $destination = $upload->getDestination();
 
                 // Do the actual file copy unless destination is in tmp/forms
-                if (strpos($destination, 'tmp/forms') !== false) {
+                if (strpos($destination, 'tmp/forms') === false) {
                     $full_name = $new_page_path . DS . $file_name;
                     copy($tmp_file, $full_name);
                 } else {
@@ -228,12 +228,12 @@ class AddPageByFormPlugin extends Plugin
                 'onFormProcessed' => ['onFormProcessed', 0]
             ];
         }
-        
+
     }
 
     /**
      * Build array of upload files and move file to destination
-     * 
+     *
      * @deprecated 2.3 For use with pre Grav version 1.6 only
      *
      * @param string $form_page_relative_page_path
@@ -443,7 +443,7 @@ class AddPageByFormPlugin extends Plugin
                     }
 
                     // Here you can insert anything else into the new page frontmatter
-                    
+
                     /*
                     $result = 'Hello World';
                     $page_frontmatter['result'] = $result;
@@ -689,7 +689,7 @@ class AddPageByFormPlugin extends Plugin
      * Process form after validation
      *
      * @deprecated 2.3 For use with pre Grav version 1.6 only
-     * 
+     *
      * @param $event
      *
      */
