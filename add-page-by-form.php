@@ -224,7 +224,6 @@ class AddPageByFormPlugin extends Plugin
         } else {
             return [
                 'onPluginsInitialized' => ['onPluginsInitialized', 0],
-                'onFormUploadSettings' => ['onFormUploadSettings', 0],
                 'onFormProcessed' => ['onFormProcessed', 0]
             ];
         }
@@ -286,46 +285,6 @@ class AddPageByFormPlugin extends Plugin
             }
         }
         return $file_fields;
-    }
-
-    /**
-     * Change destination for files with form field destination is 'self'
-     *
-     * @param string $event
-     *
-     * @return void
-     */
-    public function onFormUploadSettings(Event $event)
-    {
-        $settings = (array) $event['settings'];
-        $post = (array) $event['post'];
-
-        if (!isset($settings) || !isset($post)) {
-            return;
-        }
-
-        // If the form name does not match this plugin stop handling
-        if (explode('.', $post['__form-name__'])[0] !== $this->say_my_name) {
-            return;
-        }
-
-        // If destination of file upload is 'self' change it to tmp folder
-        if ($settings['destination'] == '@self' || $settings['destination'] == 'self@') {
-
-            // Get current tmp dir
-            $this->session_id = $this->grav['session']->getId();
-            $tmp_session_dir = FormFlash::getSessionTmpDir($this->session_id);
-
-            // Get relative path
-            $tmp_session_dir = Folder::getRelativePath($tmp_session_dir);
-
-            $destination = $tmp_session_dir . DS . $post['__unique_form_id__'] . DS . $settings['name'];
-
-            $settings['destination'] = $destination;
-
-            $event['settings'] = (object) $settings;
-
-        }
     }
 
     /**
