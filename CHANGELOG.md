@@ -1,3 +1,9 @@
+# v2.3.2
+##  11/24/2019
+
+1. [](#bugfix)
+    * Prepared a new release to fix a bug in version numbering. The letter "v" appears to be case sensitive. The versions 2.3.0 and 2.3.1 were tagged with a capital "V" as V2.3.0 and V2.3.1 respectively. Previous versions were tagged using a lowercase "v". This difference causes the Grav Repository to think these are two different plugins.
+
 # v2.3.1
 ##  10/10/2019
 
