@@ -1,3 +1,9 @@
+# v2.3.3
+##  12/05/2019
+
+1. [](#bugfix)
+    * Fixed inconsistancies in version numbering which prevented the addition of the latest updates in the Grav Plugin repository. 
+
 # v2.3.2
 ##  11/24/2019
 
