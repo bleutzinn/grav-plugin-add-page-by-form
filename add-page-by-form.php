@@ -85,14 +85,14 @@ class AddPageByFormPlugin extends Plugin
             $i = 0;
             foreach ($uploads as $upload) {
 
-                $tmp_file = $upload->getTmpFile();
+                //20/01/20 DCN: Redundant if use moveTo-->$tmp_file = $upload->getTmpFile();
                 $file_name = $upload->getClientFilename();
                 $destination = $upload->getDestination();
 
                 // Do the actual file copy unless destination is in tmp/forms
                 if (strpos($destination, 'tmp/forms') === false) {
                     $full_name = $new_page_path . DS . $file_name;
-                    copy($tmp_file, $full_name);
+                    $upload->moveTo($full_name);  //20/01/20 DCN: Use moveTo not native copy
                 } else {
                     $full_name = $destination;
                     // Leave the copy to the Form plugin
@@ -415,6 +415,13 @@ class AddPageByFormPlugin extends Plugin
                         $content = $this->config->get('plugins.add-page-by-form.default_content');
                     }
 
+                    // 18/01/20 DCN: Set the page file name to match the template given, if any
+                    if (isset($page_frontmatter['template'])) {
+                        $page_template = $page_frontmatter['template'];
+                    } else {
+                        $page_template = 'default';
+                    }
+
                     // Remove unwanted items from new page frontmatter
                     unset($page_frontmatter['_json']);
                     unset($page_frontmatter['content']);
@@ -515,10 +522,11 @@ class AddPageByFormPlugin extends Plugin
                         // (e.g. 'nl' -> 'default.nl.md')
                         $language = Grav::instance()['language']->getLanguage() ?: null;
 
+                        // 18/01/20 DCN: Use $page_template not hard-wired "default"
                         if ($language != '') {
-                            $new_page->name('default.' . $language . '.md');
+                            $new_page->name($page_template . '.' . $language . '.md');
                         } else {
-                            $new_page->name('default.md');
+                            $new_page->name($page_template . '.md');
                         }
 
                         $path = $parent_page_path . DS . $slug . DS . $new_page->name();
