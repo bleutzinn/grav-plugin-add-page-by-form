@@ -1,3 +1,12 @@
+# DCN forked repo changes fom v2.3.3
+## 20/01/2020
+
+1. Use moveTo method not native copy to move uploaded files to final destination. This stops dross building up in the source form folder.
+
+## 18/01/2020
+
+1. Set requested template in destination page file name instead of hard-wired "default" 
+
 # v2.3.3
 ##  12/05/2019
 
