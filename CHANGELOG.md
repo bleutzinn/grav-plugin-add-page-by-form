@@ -1,3 +1,12 @@
+# v2.3.4
+##  20/01/2020
+
+1. [](#bugfix)
+    * Prepared a new release to mainly consolidate the fix "Use moveTo method not native copy to move uploaded files to final destination" and to bring this changelog format back in line with Grav requirements. Thanks to Dave Nichols
+pd-giz-dave
+1. [](#improved)
+    * Also included the ability to use the new page template name as the new page's folder name.
+
 # DCN forked repo changes fom v2.3.3
 ## 20/01/2020
 

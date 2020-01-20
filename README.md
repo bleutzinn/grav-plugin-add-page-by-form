@@ -429,16 +429,14 @@ Use with caution!
 
 ## Issues
 
-### Plugin issue
-
-By setting `destination: @self` uploaded files get saved in the same folder as the new page. Changes in Grav version 1.6 called for some serious trickery to keep this functionality. A clear downside is that the temporary upload folder is not removed. By default such a folder path is "tmp/forms/<session_id>". This issue is yet unresolved.
 
 ### Grav Form issue
 
-The form on the form page is a standard Grav form. Please note that the Grav Form Plugin currently (version 3.3.0) has an issue which prevents the form to be submitted when a form field of type `file` is set to `required: true`(see issue [#106](https://github.com/getgrav/grav-plugin-form/issues/106)).
+The form on the form page is a standard Grav form. Please note that the Grav Form Plugin currently (latest test using version 4.0.1) has an issue which prevents the form to be submitted when a form field of type `file` is set to `required: true`(see issue [#106](https://github.com/getgrav/grav-plugin-form/issues/106)).
 
 
 ## Credits
 
 - Team Grav and everyone who contributes to Grav;
-- Wes Cossick for [SimpleMDE Markdown Editor](https://simplemde.com).
+- Wes Cossick for [SimpleMDE Markdown Editor](https://simplemde.com);
+- All [contributors](https://github.com/bleutzinn/grav-plugin-add-page-by-form/graphs/contributors) who've helped me out on things.
