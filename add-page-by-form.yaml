@@ -5,3 +5,4 @@ default_content: 'No content.'
 overwrite_mode: false
 include_username: false
 auto_taxonomy_types: false
+use_editor_class: true
