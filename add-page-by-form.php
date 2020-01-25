@@ -539,7 +539,7 @@ class AddPageByFormPlugin extends Plugin
                         $new_page->save();
 
                         // Add page to Pages object with routing info
-                        $pages->addPage($new_page, $this->new_page_route); //23/01/20 DCN: Hack-->$path);
+                        $pages->addPage($new_page, $path);
 
                         // Support below and above version 1.6
                         if (version_compare(GRAV_VERSION, '1.6', '<')) {
