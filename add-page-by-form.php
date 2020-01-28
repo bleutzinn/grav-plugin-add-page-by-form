@@ -117,7 +117,7 @@ class AddPageByFormPlugin extends Plugin
      * @param string $route
      * @param boolean $create
      *
-     * @return string $path
+     * @return array|null [route, path]
      *
      * Crawl a route, using modular page folder names as a fallback and
      * optionally creating non existing folders along the way
@@ -313,6 +313,8 @@ class AddPageByFormPlugin extends Plugin
                     $overwrite_mode = $this->config->get('plugins.add-page-by-form.overwrite_mode');
                     $date_format = $this->config->get('plugins.add-page-by-form.date_display_format');
                     $auto_taxonomy_types = $this->config->get('plugins.add-page-by-form.auto_taxonomy_types');
+                    $physical_template_name = $this->config->get('plugins.add-page-by-form.physical_template_name');
+
                     $slug_field = '';
 
                     // For next plugin version
@@ -340,6 +342,9 @@ class AddPageByFormPlugin extends Plugin
                         }
                         if (isset($pageconfig['slug_field'])) {
                             $slug_field = strtolower(trim($pageconfig['slug_field']));
+                        }
+                        if (isset($pageconfig['physical_template_name'])) {
+                            $physical_template_name = in_array(strtolower(trim($pageconfig['physical_template_name'])), $positives);
                         }
                     }
 
@@ -416,8 +421,12 @@ class AddPageByFormPlugin extends Plugin
                     }
 
                     // 18/01/20 DCN: Set the page file name to match the template given, if any
-                    if (isset($page_frontmatter['template'])) {
+                    // 21/01/20: take the option physical_template_name into account
+                    if ($physical_template_name && isset($page_frontmatter['template'])) {
                         $page_template = $page_frontmatter['template'];
+                        // Remove the frontmatter variable template as which template
+                        // must be used will be determined by the new page filename
+                        unset($page_frontmatter['template']);
                     } else {
                         $page_template = 'default';
                     }
@@ -723,16 +732,18 @@ class AddPageByFormPlugin extends Plugin
         if (isset($data['form']) && isset($data['form']['name']) &&
             strtolower(substr($data['form']['name'], 0, 7)) == $this->say_my_name) {
 
-            $assets = $this->grav['assets'];
-            // Add jQuery library (no harm done when already present)
-            $assets->add('jquery', 101);
-            // Add SimpleMDE Markdown Editor
-            $assets->addCss('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.css', 100);
-            $assets->addJs('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.js', 100);
-            // Add custom styles
-            $assets->addCss('plugin://add-page-by-form/assets/css/customstyles.css', 110);
-            // Load inline Javascript code from configuration file
-            $assets->addInlineJs(file_get_contents('plugin://add-page-by-form/assets/js/simplemde_config.js'), 110);
+            if ($this->config->get('plugins.add-page-by-form.use_editor_class',true)) {
+                $assets = $this->grav['assets'];
+                // Add jQuery library (no harm done when already present)
+                $assets->add('jquery', 101);
+                // Add SimpleMDE Markdown Editor
+                $assets->addCss('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.css', 100);
+                $assets->addJs('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.js', 100);
+                // Add custom styles
+                $assets->addCss('plugin://add-page-by-form/assets/css/customstyles.css', 110);
+                // Load inline Javascript code from configuration file
+                $assets->addInlineJs(file_get_contents('plugin://add-page-by-form/assets/js/simplemde_config.js'), 110);
+            }
         }
     }
 

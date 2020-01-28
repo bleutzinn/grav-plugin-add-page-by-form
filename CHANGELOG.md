@@ -1,20 +1,29 @@
+<<<<<<< Updated upstream
+# v2.3.5
+## 25/01/20
+
+1. [](#new)
+    * Add option to suppress loading of simpleMDE assets (reduces overhead if its known it will not be used) 
+    
 # v2.3.4
 ##  20/01/2020
+=======
+# v2.4.0
+##  01/28/2020
+>>>>>>> Stashed changes
+
+1. [](#new)
+    * Added a new config variable 'physical_template_name' to make using the new page template name as the new page's file name optional.
+1. [](#improved)
+    * Removed the Changelog entry that was included in [https://github.com/bleutzinn/grav-plugin-add-page-by-form/pull/47](PR #47) from this file as it was not in the Grav Changelog format and prevented changes showing up correctly in the Grav Plugins download section.
+
+# v2.3.4
+##  01/20/2020
 
 1. [](#bugfix)
-    * Prepared a new release to mainly consolidate the fix "Use moveTo method not native copy to move uploaded files to final destination" and to bring this changelog format back in line with Grav requirements. Thanks to Dave Nichols
-pd-giz-dave
+    * Prepared a new release to mainly consolidate the fix "Use moveTo method not native copy to move uploaded files to final destination" and to bring this changelog format back in line with Grav requirements. Thanks to Dave Nichols (pd-giz-dave).
 1. [](#improved)
-    * Also included the ability to use the new page template name as the new page's folder name.
-
-# DCN forked repo changes fom v2.3.3
-## 20/01/2020
-
-1. Use moveTo method not native copy to move uploaded files to final destination. This stops dross building up in the source form folder.
-
-## 18/01/2020
-
-1. Set requested template in destination page file name instead of hard-wired "default" 
+    * Also included the ability to use the new page template name as the new page's folder name. Thanks to Dave Nichols (pd-giz-dave).
 
 # v2.3.3
 ##  12/05/2019

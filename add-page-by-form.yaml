@@ -5,3 +5,8 @@ default_content: 'No content.'
 overwrite_mode: false
 include_username: false
 auto_taxonomy_types: false
+<<<<<<< Updated upstream
+use_editor_class: true
+=======
+physical_template_name: false
+>>>>>>> Stashed changes

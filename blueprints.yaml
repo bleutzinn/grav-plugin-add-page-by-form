@@ -1,5 +1,5 @@
 name: Add Page By Form
-version: 2.3.4
+version: 2.4.0
 description: Adds a page by means of a form
 icon: plus-square-o
 author:
@@ -67,3 +67,28 @@ form:
           0: Disabled
       validate:
            type: bool
+<<<<<<< Updated upstream
+    use_editor_class:
+      type: toggle
+      label: Use the editor class
+      help: When set, adding class=editor to a textarea provides the simpleMDE editor on that area
+      highlight: 0
+      default: 1
+      options:
+        1: Enabled
+        0: Disabled
+      validate:
+        type: bool
+=======
+    physical_template_name:
+      type: toggle
+      label: Physical template name
+      help: Use the template name as the physical filename of the new page
+      highlight: 0
+      default: 0
+      options:
+          1: Enabled
+          0: Disabled
+      validate:
+           type: bool
+>>>>>>> Stashed changes
