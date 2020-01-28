@@ -41,6 +41,7 @@ default_content: 'No content.'
 overwrite_mode: false
 include_username: false
 auto_taxonomy_types: false
+use_editor_class: true
 ```
 - `enabled: true|false` determines whether the plugin is active or not;
 - `date_display_format` sets a default date and time format
@@ -51,7 +52,8 @@ The next settings are also available from the Adminstration Panel:
 - `default_content` will be used as the page content for the new page when no other value is set;
 - `include_username` when set to `true` the logged in frontend user username is added to the new page frontmatter;
 - `overwrite_mode` if `true` the new page will replace a page by the same name or slug if it exists. Both page content and media will be overwritten;
-- `auto_taxonomy_types` saves any new taxonomy types that were input by the user to the site configuration file `site.yaml`.
+- `auto_taxonomy_types` saves any new taxonomy types that were input by the user to the site configuration file `site.yaml`;
+- `use_editor_class` if `true` then adding `class=editor` to a form textarea provides the simpleMDE editor on that area, if `false` the simpleMDE and related assets are not loaded, useful to reduce assets overhead if its known it will not be used;
 
 
 ### Configuration Changes

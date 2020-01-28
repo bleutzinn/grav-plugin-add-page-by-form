@@ -117,7 +117,7 @@ class AddPageByFormPlugin extends Plugin
      * @param string $route
      * @param boolean $create
      *
-     * @return string $path
+     * @return array|null [route, path]
      *
      * Crawl a route, using modular page folder names as a fallback and
      * optionally creating non existing folders along the way
@@ -723,16 +723,18 @@ class AddPageByFormPlugin extends Plugin
         if (isset($data['form']) && isset($data['form']['name']) &&
             strtolower(substr($data['form']['name'], 0, 7)) == $this->say_my_name) {
 
-            $assets = $this->grav['assets'];
-            // Add jQuery library (no harm done when already present)
-            $assets->add('jquery', 101);
-            // Add SimpleMDE Markdown Editor
-            $assets->addCss('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.css', 100);
-            $assets->addJs('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.js', 100);
-            // Add custom styles
-            $assets->addCss('plugin://add-page-by-form/assets/css/customstyles.css', 110);
-            // Load inline Javascript code from configuration file
-            $assets->addInlineJs(file_get_contents('plugin://add-page-by-form/assets/js/simplemde_config.js'), 110);
+            if ($this->config->get('plugins.add-page-by-form.use_editor_class',true)) {
+                $assets = $this->grav['assets'];
+                // Add jQuery library (no harm done when already present)
+                $assets->add('jquery', 101);
+                // Add SimpleMDE Markdown Editor
+                $assets->addCss('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.css', 100);
+                $assets->addJs('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.js', 100);
+                // Add custom styles
+                $assets->addCss('plugin://add-page-by-form/assets/css/customstyles.css', 110);
+                // Load inline Javascript code from configuration file
+                $assets->addInlineJs(file_get_contents('plugin://add-page-by-form/assets/js/simplemde_config.js'), 110);
+            }
         }
     }
 

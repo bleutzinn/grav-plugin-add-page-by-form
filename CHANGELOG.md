@@ -1,3 +1,9 @@
+# v2.3.5
+## 25/01/20
+
+1. [](#new)
+    * Add option to suppress loading of simpleMDE assets (reduces overhead if its known it will not be used) 
+    
 # v2.3.4
 ##  20/01/2020
 

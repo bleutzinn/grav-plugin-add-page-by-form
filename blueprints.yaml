@@ -67,3 +67,14 @@ form:
           0: Disabled
       validate:
            type: bool
+    use_editor_class:
+      type: toggle
+      label: Use the editor class
+      help: When set, adding class=editor to a textarea provides the simpleMDE editor on that area
+      highlight: 0
+      default: 1
+      options:
+        1: Enabled
+        0: Disabled
+      validate:
+        type: bool
