@@ -42,6 +42,7 @@ overwrite_mode: false
 include_username: false
 auto_taxonomy_types: false
 use_editor_class: true
+physical_template_name: false
 ```
 - `enabled: true|false` determines whether the plugin is active or not;
 - `date_display_format` sets a default date and time format
@@ -54,12 +55,14 @@ The next settings are also available from the Adminstration Panel:
 - `overwrite_mode` if `true` the new page will replace a page by the same name or slug if it exists. Both page content and media will be overwritten;
 - `auto_taxonomy_types` saves any new taxonomy types that were input by the user to the site configuration file `site.yaml`;
 - `use_editor_class` if `true` then adding `class=editor` to a form textarea provides the simpleMDE editor on that area, if `false` the simpleMDE and related assets are not loaded, useful to reduce assets overhead if its known it will not be used;
+- `physical_template_name` if `true` the template name is used for the physical filesystem filename of the new page plus the language extension (if any) and the standard Markdown extension `.md`.
 
 
-### Configuration Changes
+### Customizing the default configuration
 
-Simply edit the plugin options in the Admin panel, or, if you don't use the Admin panel, copy the `add-page-by-form.yaml` default file to your `user/config/plugins` folder and use that copy to change configuration settings.   
-Read below for more help on what these fields do and how they can help you modify the plugin.
+To keep your custom configuration when updating the plugin you need to use a configuration file which is stored in the `user/config/plugins` folder.
+
+Simply edit the plugin options in the Admin panel and the changes will be saved to the configuration file in that location. If you don't use the Admin panel, copy the `add-page-by-form.yaml` default file to your `user/config/plugins` folder and use that copy to change configuration settings.   
 
 
 ## Usage
@@ -85,6 +88,148 @@ The basic method of modifying is overriding or replacing an initial value. An ex
 ### Page Headers / Frontmatter
 This plugin makes extensive use of [Custom Page Headers](https://learn.getgrav.org/content/headers#custom-page-headers). The Grav documentation mixes the terms "frontmatter", "page headers" and simply "headers". This may be confusing at first. They [all](https://learn.getgrav.org/content/headers) refer to the optional top part of a Grav page which contains data in [YAML syntax](https://learn.getgrav.org/advanced/yaml).
 
+
+## Form page Frontmatter
+
+The frontmatter in the form page and the way it is handled by the plugin is where the flexibility of this plugin originates.
+
+The form page frontmatter is divided into three sections or blocks:
+
+1. So called 'root level' variables are intended to act upon the form page itself. They are not passed on to the new page;
+2. the `pageconfig` block contains variables that are used by the plugin in the new page creation process and do get passed on to the new page frontmatter;
+3. the `pagefrontmatter` block holds all other variables that must be passed on to the new page frontmatter.
+
+### Root level frontmatter
+In the examples above the root level configuration options are:
+
+- `title` sets the title of the page containing the form;
+- `template: form` activates the form on this page (not required when the form page is named `form.md`);
+- `form` defines the form.
+
+From version 2, the use of `parent` in the, what is now called, root level block is deprecated. It is however still supported for backwards compatibility.
+
+### 'pageconfig' block frontmatter
+In the optional pageconfig block you can set these, and only these, variables (other variables will be ignored):
+
+- `parent` sets the parent page for the new page. This variable may be an absolute route (for example `parent: /user_contributions`) or a relative route (e.g. `parent: articles`. In case of an absolute route this route starts from the pages root. A relative route is regarded to start from the form page, so the new page will be a child page of the form page. The form page is also used as the parent page when the set parent page does not exist;
+- `subroute` defines a route from the (initial) parent value. If one or more folders in the route do not exist they will be created; 
+- `slug_field` tells the plugin what field to use as the new page's slug or folder name. When `slug_field` is missing the plugin tries to use the value of `title`;
+- `overwrite_mode: true|false` (default false) tells the plugin what to do when a page with the same name already exists. With `overwrite_mode: true` the existing page is overwritten. Any additional (media) files besides the page itself which are stored in the existing page folder are deleted as well. With `overwite_mode: false` the new page slug gets a sequential number attached at the end (for example "my-new-page-1" in case "my-new-page" exists);
+- `include_username: true|false` (default false) determines whether or not to include the username of a logged in frontend user in the new page frontmatter;
+- `physical_template_name: true|false` (default false) does or does not cause the plugin to use the template name of the new page as that new page's filesystem filename. Note that to avoid future confusion the frontmatter variable `template` is removed from the new page frontmatter.
+
+#### A note on parent and subroute
+
+Together the variables `parent` and `subroute` define the new page's destination. Or, in other words, together they set the path or route of the new page filesystem folder in the page structure.
+
+The difference between parent and subroute worded in another way:
+
+- Parent: works on a page level; when there is no page at the parent route, the form page is used as the parent;
+- Subroute: works on a folder level; a subroute may consist of empty folders and if a folder in the subroute does not exist it gets created.
+
+### 'pagefrontmatter' block frontmatter
+The content of the optional `pagefrontmatter` block will be included in the new page frontmatter.
+
+
+## Form usage
+
+The form page needs to use a [simple single form](https://learn.getgrav.org/forms/forms#create-a-simple-single-form).
+
+Two examples are included at the end of this ReadMe file.
+
+### Mandatory fields and values
+
+#### Form Name
+It is always a good thing to give each form a unique name, especially when multiple forms are used.
+
+To pre fill form fields with default values the Form name must begin with "addpage":
+
+```
+form:
+    name: addpage.blogpost
+```
+
+#### Form Actions
+
+**Custom Form processing**	 ( Important ! )
+
+To let the plugin process the form after a Submit the custom process action must be set to:
+
+```
+    process:
+        -
+            addpage: null
+```
+
+**Redirect to the new page**
+
+
+To show the new page to the user set the `redirect` action to the custom value `@self` or `@self-admin`.
+
+When using `redirect: '@self'` the page will be shown as a regular web page, for example:
+
+```
+    process:
+        -
+            addpage: null
+        -
+            redirect: '@self'
+```
+
+To open the new page in the Admin panel use `redirect: '@self-admin'`.  
+Note that this plugin does not handle the admin user authentication. If the Admin plugin is not installed or is inactive redirection occurs as if `@self` was used.
+
+> Tip: using `@self-admin` is a very convenient way to learn how to use this plugin as it is easy to view and examine the source of the resulting new page including it's frontmatter in the Admin panel.
+
+### Using a Markdown editor in textarea fields
+When a `textarea` field is given the class `editor` it will use the [SimpleMDE Markdown Editor](https://simplemde.com).
+
+
+## Value overrides
+
+The variables which are defined and given a value in the `pageconfig` and `pagefrontmatter` blocks may be 'overridden' or in other words replaced by form input fields. In that respect these variables can be seen to hold a set of default values.
+
+There is only one exception to the default variable override behaviour and that is the handling of `taxonomy` types. Extra taxonomy types and values (for example tags) which are entered via form fields are added to the new page taxonomy.
+
+To override a default value by user input is simply a matter of including a form field by the same name in the page form.   
+For example in the example 2 - _create a new blog post_, the default title is set to "My new Blog post". The form contains a form field of type text with `name: title`. Thus the user is prompted to enter a title for the new page in the form but does not need to do so because filling in the title field is not mandatory. If the user enters a title that value is used as the title for the new page. If he or she does not, the default title "My new Blog post" will be used.
+
+
+## Setting taxonomy categories and tags
+
+The Add Blog Post example shows how to let the user add extra tags via the form.
+Extra categories may be added in the same way.
+
+
+## Handling extra taxonomy types
+
+By default Grav 'knows' two taxonomy types, `category` and `tag`. Extra taxonomy types may be defined and added just like with any other variables you can include a form field. The new type is then added to the list of taxonomy types instead of replacing the existing types.
+
+This can be done in the `pagefrontmatter` block. For example, to define a new taxonomy type named 'department':
+
+```
+pagefrontmatter:
+    taxonomy:
+        - department
+```
+And/or in the form:
+
+```
+form:
+    name: my_form
+    fields:
+        -
+            name: taxonomy
+            label: Taxonomy type
+            type: text
+```
+
+This is a feature which calls for a solid look-before-you-leap approach because of it's side effects. Using a new taxonomy type requires it to be included in the list of known taxonomy types. This list is in the site configuration file `site.yaml`.
+
+By setting the plugin configuration option `auto_taxonomy_types: true` new types get automatically saved and can then be used in a collection.
+
+The side effect and possibly downside is that every modification of the site configuration file causes Grav to rebuild the cache, so this may not be desirable with larger sites.   
+Use with caution!
 
 ## Examples
 
@@ -288,146 +433,6 @@ Write your blog post:
 ```
 After the form has been submitted the user is taken to the blog main page where the new post should show up.
 
-
-## Form page Frontmatter
-
-The frontmatter in the form page and the way it is handled by the plugin is where the flexibility of this plugin originates.
-
-The form page frontmatter is divided into three sections or blocks:
-
-1. So called 'root level' variables are intended to act upon the form page itself. They are not passed on to the new page;
-2. the `pageconfig` block contains variables that are used by the plugin in the new page creation process and do get passed on to the new page frontmatter;
-3. the `pagefrontmatter` block holds all other variables that must be passed on to the new page frontmatter.
-
-### Root level frontmatter
-In the examples above the root level configuration options are:
-
-- `title` sets the title of the page containing the form;
-- `template: form` activates the form on this page (not required when the form page is named `form.md`);
-- `form` defines the form.
-
-From version 2, the use of `parent` in the, what is now called, root level block is deprecated. It is however still supported for backwards compatibility.
-
-### 'pageconfig' block frontmatter
-In the optional pageconfig block you can set these, and only these, variables (other variables will be ignored):
-
-- `parent` sets the parent page for the new page. This variable may be an absolute route (for example `parent: /user_contributions`) or a relative route (e.g. `parent: articles`. In case of an absolute route this route starts from the pages root. A relative route is regarded to start from the form page, so the new page will be a child page of the form page. The form page is also used as the parent page when the set parent page does not exist;
-- `subroute` defines a route from the (initial) parent value. If one or more folders in the route do not exist they will be created; 
-- `slug_field` tells the plugin what field to use as the new page's slug or folder name. When `slug_field` is missing the plugin tries to use the value of `title`;
-- `overwrite_mode: true|false` (default false) tells the plugin what to do when a page with the same name already exists. With `overwrite_mode: true` the existing page is overwritten. Any additional (media) files besides the page itself which are stored in the existing page folder are deleted as well. With `overwite_mode: false` the new page slug gets a sequential number attached at the end (for example "my-new-page-1" in case "my-new-page" exists);
-- `username: true|false` (default false) determines whether or not to include the username of a logged in frontend user in the new page frontmatter.
-
-#### parent and subroute
-Together the variables `parent` and `subroute` define the new page's destination. Or, in other words, together they set the path or route of the new page filesystem folder in the page structure.
-
-The difference between parent and subroute worded in another way:
-
-- Parent: works on a page level; when there is no page at the parent route, the form page is used as the parent;
-- Subroute: works on a folder level; a subroute may consist of empty folders and if a folder in the subroute does not exist it gets created. 
-
-#### username
-The currently logged in frontend user's username can be included in the new page frontmatter by setting `username: true`.
-
-### 'pagefrontmatter' block frontmatter
-The content of the optional `pagefrontmatter` block will be included in the new page frontmatter.
-
-
-## Form usage
-
-The form needs to be a [simple single form](https://learn.getgrav.org/forms/forms#create-a-simple-single-form).
-
-### Mandatory fields and values
-
-#### Form Name
-It is always a good thing to give each form a unique name, especially when multiple forms are used.
-
-To pre fill form fields with default values the Form name must begin with "addpage":
-
-```
-form:
-    name: addpage.blogpost
-```
-
-#### Form Actions
-
-**Custom Form processing**	 ( Important ! )
-
-To let the plugin process the form after a Submit the custom process action must be set to:
-
-```
-    process:
-        -
-            addpage: null
-```
-
-**Redirect to the new page**
-
-
-To show the new page to the user set the `redirect` action to the custom value `@self` or '@self-admin`.
-
-When using `redirect: '@self'` the page will be shown as a regular web page, for example:
-
-```
-    process:
-        -
-            addpage: null
-        -
-            redirect: '@self'
-``` 
-
-To open the new page in the Admin panel use `redirect: '@self-admin'`. Note that this plugin does not handle the admin user authentication. If the Admin plugin is not installed or is inactive redirection occurs as if `@self` was used.
-
-> Tip: using `@self-admin` is a very convenient way to learn how to use this plugin as it is easy to see the resulting new page frontmatter in the Admin panel.
-
-### Using a Markdown editor in textarea fields
-When a `textarea` field is given the class `editor` it will use the [SimpleMDE Markdown Editor](https://simplemde.com).
-
-
-## Value overrides
-
-The variables which are defined and given a value in the `pageconfig` and `pagefrontmatter` blocks may be 'overridden' or replaced by form input fields. In that respect these variables can be seen to hold a set of default values.
-
-There is only one exception to the default variable override behaviour and that is the handling of `taxonomy` types. Extra taxonomy types and values (for example tags) which are entered via form fields are added to the new page taxonomy.
-
-To override a default value by user input is simply a matter of including a form field by the same name in the page form.   
-For example in the example 2 - _create a new blog post_, the default title is set to "My new Blog post". The form contains a form field of type text with `name: title`. Thus the user is prompted to enter a title for the new page in the form but does not need to do so because filling in the title field is not mandatory. If the user enters a title that value is used as the title for the new page. If he or she does not, the default title "My new Blog post" will be used.
-
-
-## Setting taxonomy categories and tags
-
-The Add Blog Post example shows how to let the user add extra tags via the form.
-Extra categories may be added in the same way.
-
-
-## Handling extra taxonomy types
-
-By default Grav 'knows' two taxonomy types, `category` and `tag`. Extra taxonomy types may be defined and added just like with any other variables you can include a form field. The new type is then added to the list of taxonomy types instead of replacing the existing types.
-
-This can be done in the `pagefrontmatter` block. For example, to define a new taxonomy type named 'department':
-
-```
-pagefrontmatter:
-    taxonomy:
-        - department
-```
-And/or in the form:
-
-```
-form:
-    name: my_form
-    fields:
-        -
-            name: taxonomy
-            label: Taxonomy type
-            type: text
-```
-
-This is a feature which calls for a solid look-before-you-leap approach because of it's side effects. Using a new taxonomy type requires it to be included in the list of known taxonomy types. This list is in the site configuration file `site.yaml`.
-
-By setting the plugin configuration option `auto_taxonomy_types: true` new types get automatically saved and can then be used in a collection.
-
-The side effect and possibly downside is that every modification of the site configuration file causes Grav to rebuild the cache, so this may not be desirable with larger sites.   
-Use with caution!
 
 ## Issues
 
