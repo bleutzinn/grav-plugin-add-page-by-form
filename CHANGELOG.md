@@ -1,21 +1,16 @@
-<<<<<<< Updated upstream
-# v2.3.5
-## 25/01/20
-
-1. [](#new)
-    * Add option to suppress loading of simpleMDE assets (reduces overhead if its known it will not be used) 
-    
-# v2.3.4
-##  20/01/2020
-=======
 # v2.4.0
 ##  01/28/2020
->>>>>>> Stashed changes
 
 1. [](#new)
     * Added a new config variable 'physical_template_name' to make using the new page template name as the new page's file name optional.
 1. [](#improved)
     * Removed the Changelog entry that was included in [https://github.com/bleutzinn/grav-plugin-add-page-by-form/pull/47](PR #47) from this file as it was not in the Grav Changelog format and prevented changes showing up correctly in the Grav Plugins download section.
+
+# v2.3.5
+## 01/25/2020
+
+1. [](#new)
+    * Add option to suppress loading of simpleMDE assets (reduces overhead if its known it will not be used) 
 
 # v2.3.4
 ##  01/20/2020

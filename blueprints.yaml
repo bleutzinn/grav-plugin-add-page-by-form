@@ -67,7 +67,6 @@ form:
           0: Disabled
       validate:
            type: bool
-<<<<<<< Updated upstream
     use_editor_class:
       type: toggle
       label: Use the editor class
@@ -79,7 +78,6 @@ form:
         0: Disabled
       validate:
         type: bool
-=======
     physical_template_name:
       type: toggle
       label: Physical template name
@@ -91,4 +89,3 @@ form:
           0: Disabled
       validate:
            type: bool
->>>>>>> Stashed changes
