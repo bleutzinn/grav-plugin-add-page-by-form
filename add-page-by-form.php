@@ -496,6 +496,14 @@ class AddPageByFormPlugin extends Plugin
                         }
                     }
 
+                    if (empty($slug)) {
+                        $this->grav->fireEvent('onFormValidationError', new Event([
+                            'form' => $form,
+                            'message' => '<strong>ERROR</strong> in Add Page by Form Plugin: Variable \'slug\' is empty']));
+                        $event->stopPropagation();
+                        return;
+                    }
+
                     $new_page_folder = $parent_page_path . DS . $slug;
 
                     // Check overwrite mode
