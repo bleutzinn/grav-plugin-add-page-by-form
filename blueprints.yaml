@@ -78,6 +78,22 @@ form:
         0: Disabled
       validate:
         type: bool
+    date_display_format:
+      type: select
+      size: medium
+      classes: fancy
+      label: Date Format
+      default: 'd-m-Y H:i'
+      options:
+        'F jS Y': "February 1st 2014"
+        'l jS of F': "Saturday 1st of February"
+        'D, m M Y': "Sat, 01 Feb 2014"
+        'd-m-y': "01-02-14"
+        'd-m-Y': "01-02-2014"
+        'jS M Y': "1st Feb 2014"
+        'F Y': "Feb 2014"
+        'Y-m-d': "2014-02-01"
+        'd-m-Y H:i': "01-02-2014 09:30"
     physical_template_name:
       type: toggle
       label: Physical template name
