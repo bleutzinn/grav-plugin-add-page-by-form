@@ -1,3 +1,9 @@
+# v2.4.1
+##  04/12/2020
+
+1. [](#bugfix)
+    * Fixed a bug ([issue #52](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues/52)) where an empty value for the 'slug' variable would delete folder(s). Thanks to [anton-mellit](https://github.com/anton-mellit) for reporting this.
+
 # v2.4.0
 ##  01/28/2020
 
