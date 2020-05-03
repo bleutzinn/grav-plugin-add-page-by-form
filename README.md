@@ -52,7 +52,7 @@ physical_template_name: true
 - `include_username` sets whether or not the username of the currently logged in frontend user is included in the new page frontmatter;
 - `overwrite_mode` determines how to act when a page with the same name or slug already exists;
 - `auto_taxonomy_types` saves any new taxonomy types that were input by the user to the site configuration file `site.yaml`;
-- `use_editor_class` determines to change a textarea field into a Markdown editor;
+- `use_editor_class` determines whether or not to change a textarea field into a Markdown editor when the texture field includes the class "editor" (`classes: editor`);
 - `physical_template_name` should normally not be used. For more information see the description in the section 'pageconfig' block variables.
 
 
@@ -144,23 +144,18 @@ Two examples are included at the end of this ReadMe file.
 #### Form Name
 It is always a good thing to give each form a unique name, especially when multiple forms are used.
 
-To pre fill form fields with default values the Form name must begin with "addpage":
+To pre fill form fields with default values the Form name must include the string "add_page". Valid names are for example `add_page.blogpost`, `add_page_profile`.
 
-```
-form:
-    name: addpage.blogpost
-```
-
-#### Form Actions
+###Form Actions
 
 **Custom Form processing**	 ( Important ! )
 
-To let the plugin process the form after a Submit the custom process action must be set to:
+To let the plugin process the form after a Submit a custom process action must be set like so:
 
 ```
     process:
         -
-            addpage: null
+            add_page: true
 ```
 
 **Redirect to the new page**
@@ -173,7 +168,7 @@ When using `redirect: '@self'` the page will be shown as a regular web page, for
 ```
     process:
         -
-            addpage: null
+            add_page: true
         -
             redirect: '@self'
 ```

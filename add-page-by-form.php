@@ -89,14 +89,13 @@ class AddPageByFormPlugin extends Plugin
 
                 // When upload field has been emptied $upload == null
                 if ($upload) {
-                    //20/01/20 DCN: Redundant if use moveTo-->$tmp_file = $upload->getTmpFile();
                     $file_name = $upload->getClientFilename();
                     $destination = $upload->getDestination();
 
                     // Do the actual file copy unless destination is in tmp/forms
                     if (strpos($destination, 'tmp/forms') === false) {
                         $full_name = $new_page_path . DS . $file_name;
-                        $upload->moveTo($full_name);  //20/01/20 DCN: Use moveTo not native copy
+                        $upload->moveTo($full_name);
                     } else {
                         $full_name = $destination;
                         // Leave the copy to the Form plugin
