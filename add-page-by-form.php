@@ -20,9 +20,11 @@ class AddPageByFormPlugin extends Plugin
 
     private $new_page_route = '';
     private $move_self_files = false;
-    private $say_my_name = 'addpage';
+    private $say_my_name = ['addpage', 'add_page'];
     private $uploads = array();
     private $page_frontmatter = array();
+
+    protected $post = array();
 
     /**
      * Extends a path
@@ -76,40 +78,46 @@ class AddPageByFormPlugin extends Plugin
         $new_page_path = $new_page->relativePagePath();
 
         $file_fields = array();
+        $deleted_files = array();
 
         $flash = $form->getFlash();
         $fields = $flash->getFilesByFields();
 
-        foreach ($fields as $key => $uploads) {
-            $file_fields[$key] = array();
-            $i = 0;
-            foreach ($uploads as $upload) {
+        foreach ($fields as $file_field => $uploads) {
+            $file_fields[$file_field] = array();
+            foreach ($uploads as $file_name => $upload) {
 
-                //20/01/20 DCN: Redundant if use moveTo-->$tmp_file = $upload->getTmpFile();
-                $file_name = $upload->getClientFilename();
-                $destination = $upload->getDestination();
+                // When upload field has been emptied $upload == null
+                if ($upload) {
+                    //20/01/20 DCN: Redundant if use moveTo-->$tmp_file = $upload->getTmpFile();
+                    $file_name = $upload->getClientFilename();
+                    $destination = $upload->getDestination();
 
-                // Do the actual file copy unless destination is in tmp/forms
-                if (strpos($destination, 'tmp/forms') === false) {
-                    $full_name = $new_page_path . DS . $file_name;
-                    $upload->moveTo($full_name);  //20/01/20 DCN: Use moveTo not native copy
-                } else {
-                    $full_name = $destination;
-                    // Leave the copy to the Form plugin
+                    // Do the actual file copy unless destination is in tmp/forms
+                    if (strpos($destination, 'tmp/forms') === false) {
+                        $full_name = $new_page_path . DS . $file_name;
+                        $upload->moveTo($full_name);  //20/01/20 DCN: Use moveTo not native copy
+                    } else {
+                        $full_name = $destination;
+                        // Leave the copy to the Form plugin
+                    }
+
+                    $file_fields[$file_field][$full_name] = [
+                        'name' => $file_name,
+                        'type' => $upload->getClientMediaType(),
+                        'size' => $upload->getSize(),
+                        'path' => $full_name
+                    ];
                 }
-
-                $file_fields[$key][$i] = array();
-                //$file_fields[$key][$destination][] = array();
-                $file_fields[$key][$i]['name'] = $file_name;
-                $file_fields[$key][$i]['type'] = $upload->getClientMediaType();
-                $file_fields[$key][$i]['size'] = $upload->getSize();
-                $file_fields[$key][$i]['path'] = $full_name;
-
-                $i += 1;
+                else {
+                    // Uploaded file was removed by the user
+                    $to_be_deleted = $new_page_path . DS . $file_name;
+                    array_push($deleted_files, array('file_field' => $file_field, 'file_path' => $to_be_deleted));
+                }
             }
         }
 
-        return $file_fields;
+        return array('uploaded' => $file_fields, 'deleted' => $deleted_files);
     }
 
     /**
@@ -166,6 +174,63 @@ class AddPageByFormPlugin extends Plugin
             Folder::create($path . DS . $folder_name);
         }
         return $folder_name;
+    }
+
+
+    /**
+    * Custom filter_var
+    *
+    * Based upon: https://gist.github.com/chtombleson/10002134
+    * Get a value from $_POST and sanitize it
+    *
+    * @param string $var    Variable to check
+    * @param string $type   What type is the value (string, email, int, float, encoded, url, email)
+    * @param array  $option Options for filter_var
+    * @return mixed will return false on failure
+    */
+    public function filter_post_var($var, $type = 'string', $options = array()) {
+        if (!isset($this->post[$var])) {
+            return false;
+        }
+
+        return filter_var($this->post[$var], $this->get_filter($type), $options);
+    }
+
+    /**
+     * Source: https://gist.github.com/chtombleson/10002134
+     *
+     */
+    private function get_filter($type) {
+        switch (strtolower($type)) {
+            case 'string':
+                $filter = FILTER_SANITIZE_STRING;
+                break;
+
+            case 'int':
+                $filter = FILTER_SANITIZE_NUMBER_INT;
+                break;
+
+            case 'float' || 'decimal':
+                $filter = FILTER_SANITIZE_NUMBER_FLOAT;
+                break;
+
+            case 'encoded':
+                $filter = FILTER_SANITIZE_ENCODED;
+                break;
+
+            case 'url':
+                $filter = FILTER_SANITIZE_URL;
+                break;
+
+            case 'email':
+                $filter = FILTER_SANITIZE_EMAIL;
+                break;
+
+            default:
+                $filter = FILTER_SANITIZE_STRING;
+        }
+
+        return $filter;
     }
 
     /**
@@ -231,63 +296,6 @@ class AddPageByFormPlugin extends Plugin
     }
 
     /**
-     * Build array of upload files and move file to destination
-     *
-     * @deprecated 2.3 For use with pre Grav version 1.6 only
-     *
-     * @param string $form_page_relative_page_path
-     * @param string $parent_page_path
-     * @param string $slug
-     *
-     * @return array $file_fields
-     */
-    public function moveFiles($form_page_relative_page_path, $parent_page_path, $slug)
-    {
-        // Move uploaded files to the new page folder
-        // and prepare uploaded file properties
-        $file_fields = array();
-        if ($this->move_self_files) {
-            $uploads = $this->uploads;
-            foreach ($uploads as $key => $upload) {
-                foreach ($upload as $key => $files) {
-                    $file_fields[$key] = array();
-                    $i = 0;
-                    foreach ($files as $destination => $file) {
-                        $destination = $file['path'];
-                        if (strpos($destination, $form_page_relative_page_path) !== false) {
-                            // Destination points to this form page
-                            // Assume this is caused by "destination: @self"
-                            // Sanitize filename and change destination to point
-                            // to the new page
-                            $file_name = $this->sanitize(substr($destination, strrpos($destination, DS) + 1));
-                            $destination_file_path = $parent_page_path . DS . $slug . DS . $file_name;
-                        } else {
-                            $destination_file_path = ROOT_DIR . $destination;
-                        }
-
-                        // Do actual move
-                        rename($file['tmp_name'], $destination_file_path);
-
-                        $file_fields[$key][$i] = array();
-                        foreach ($file as $property => $value) {
-                            if ($property == 'name') {
-                                $value = $this->sanitize($value);
-                            }
-                            if ($property != 'tmp_name') {
-                                $file_fields[$key][$i][$property] = $value;
-                            }
-                        }
-                        // (Re)Set file path starting at the root folder
-                        $file_fields[$key][$i]['path'] = str_replace(rtrim(ROOT_DIR, DS), '', $destination_file_path);
-                        $i++;
-                    }
-                }
-            }
-        }
-        return $file_fields;
-    }
-
-    /**
      * Handle form action
      *
      * @param $event
@@ -299,11 +307,12 @@ class AddPageByFormPlugin extends Plugin
         $action = $event['action'];
         $params = $event['params'];
 
-        switch ($action) {
-            case $this->say_my_name:
+        switch (true) {
+            case (in_array($action, $this->say_my_name)):
 
                 if (isset($_POST)) {
 
+                    $pages = $this->grav['pages'];
                     $page = $this->grav['page'];
                     $header = $page->header();
                     $form_page_relative_page_path = $page->relativePagePath();
@@ -311,6 +320,10 @@ class AddPageByFormPlugin extends Plugin
                     // Get default settings form plugin config
                     $include_username = $this->config->get('plugins.add-page-by-form.include_username');
                     $overwrite_mode = $this->config->get('plugins.add-page-by-form.overwrite_mode');
+                    // Convert overwrite_mode to boolean if appropriate
+                    if($overwrite_mode != 'edit') {
+                        $overwrite_mode = (bool) $overwrite_mode;
+                    }
                     $date_format = $this->config->get('plugins.add-page-by-form.date_display_format');
                     $auto_taxonomy_types = $this->config->get('plugins.add-page-by-form.auto_taxonomy_types');
                     $physical_template_name = $this->config->get('plugins.add-page-by-form.physical_template_name');
@@ -338,7 +351,10 @@ class AddPageByFormPlugin extends Plugin
                             $include_username = in_array(strtolower(trim($pageconfig['include_username'])), $positives);
                         }
                         if (isset($pageconfig['overwrite_mode'])) {
-                            $overwrite_mode = in_array(strtolower(trim($pageconfig['overwrite_mode'])), $positives);
+                            $overwrite_mode = strtolower(trim($pageconfig['overwrite_mode']));
+                            if ($overwrite_mode != 'edit') {
+                                $overwrite_mode = in_array(strtolower(trim($pageconfig['overwrite_mode'])), $positives);
+                            }
                         }
                         if (isset($pageconfig['slug_field'])) {
                             $slug_field = strtolower(trim($pageconfig['slug_field']));
@@ -370,6 +386,7 @@ class AddPageByFormPlugin extends Plugin
 
                     // Get all form field values
                     $form_data = $form->value()->toArray();
+
                     if (isset($form_data)) {
 
                         // Append taxonomy
@@ -420,8 +437,6 @@ class AddPageByFormPlugin extends Plugin
                         $content = $this->config->get('plugins.add-page-by-form.default_content');
                     }
 
-                    // 18/01/20 DCN: Set the page file name to match the template given, if any
-                    // 21/01/20: take the option physical_template_name into account
                     if ($physical_template_name && isset($page_frontmatter['template'])) {
                         $page_template = $page_frontmatter['template'];
                         // Remove the frontmatter variable template as which template
@@ -460,39 +475,48 @@ class AddPageByFormPlugin extends Plugin
                         $parent = rtrim($parent, DS);
                     }
 
+                    // Get the "parent to be"
                     $parent_page = $this->getParentPage($parent, $page);
 
                     $parent_page_path = $parent_page->path();
                     $parent_page_route = $parent_page->route();
 
-                    // Override subroute
-                    if (isset($form_data['subroute'])) {
-                        $sub_route = mb_strtolower(trim($form_data['subroute']));
+                    // overwrite_mode == 'edit' needs more work to become generic !!!
+                    if ($overwrite_mode == 'edit') {
+                        // Get slug from exisiting page
+                        $slug = basename(dirname($form_data['file_path']));
                     }
-                    if ($sub_route != '') {
-                        // Remove any multiple concatenated slashes
-                        $sub_route = preg_replace('/[\/]+/', DS, $sub_route);
-                        // Remove preceding and trailing slashes if present
-                        $sub_route = trim($sub_route, DS);
-                        // Prepare for crawling
-                        $parent_page_route = $parent_page->route() . DS . $sub_route;
-                        // Create subroute path if it doesn't exist
-                        $parent_destination = $this->crawlRoute($parent_page_route, true);
-                        $parent_page_route = $parent_destination['route'];
-                        $parent_page_path = $parent_destination['path'];
-                    }
-                    // Create a slug to be used as the page name (used publicly in URLs etc.)
-                    if ($slug_field != '') {
-                        if (isset($page_frontmatter[$slug_field])) {
-                            $slug = $this->sanitize($page_frontmatter[$slug_field], 'slug');
+                    else {
+                        // Create the slug for the new page
+                        // Override subroute
+                        if (isset($form_data['subroute'])) {
+                            $sub_route = mb_strtolower(trim($form_data['subroute']));
                         }
-                    }
-                    if (!isset($slug)) {
-                        if (isset($page_frontmatter['title'])) {
-                            $slug = $this->sanitize($page_frontmatter['title'], 'slug');
-                        } else {
-                            $slug = $this->config->get('plugins.add-page-by-form.default_title');
-                            $slug = $this->sanitize($slug, 'slug');
+                        if ($sub_route != '') {
+                            // Remove any multiple concatenated slashes
+                            $sub_route = preg_replace('/[\/]+/', DS, $sub_route);
+                            // Remove preceding and trailing slashes if present
+                            $sub_route = trim($sub_route, DS);
+                            // Prepare for crawling
+                            $parent_page_route = $parent_page->route() . DS . $sub_route;
+                            // Create subroute path if it doesn't exist
+                            $parent_destination = $this->crawlRoute($parent_page_route, true);
+                            $parent_page_route = $parent_destination['route'];
+                            $parent_page_path = $parent_destination['path'];
+                        }
+                        // Create a slug to be used as the page name (used publicly in URLs etc.)
+                        if ($slug_field != '') {
+                            if (isset($page_frontmatter[$slug_field])) {
+                                $slug = self::slug($page_frontmatter[$slug_field]);
+                            }
+                        }
+                        if (!isset($slug)) {
+                            if (isset($page_frontmatter['title'])) {
+                                $slug = self::slug($page_frontmatter['title']);
+                            } else {
+                                $slug = $this->config->get('plugins.add-page-by-form.default_title');
+                                $slug = self::slug($slug);
+                            }
                         }
                     }
 
@@ -507,10 +531,17 @@ class AddPageByFormPlugin extends Plugin
                     $new_page_folder = $parent_page_path . DS . $slug;
 
                     // Check overwrite mode
+                    //  When overwrite mode == true: replace page including media
+                    //  When overwrite mode == false: create a sequential named page
+                    //  When overwrite mode == 'edit': edit page and page media
                     if ($overwrite_mode) {
-                        // Overwrite page; simply delete folder to remove existing media as well
                         if (file_exists($new_page_folder)) {
-                            Folder::delete($new_page_folder);
+                            if ($overwrite_mode == 'edit') {
+                                $original_frontmatter = (array)$pages->get($new_page_folder)->header();
+                            }
+                            else {
+                                Folder::delete($new_page_folder);
+                            }
                         }
                     } else {
                         // Scan for the next available sequential suffix
@@ -525,13 +556,9 @@ class AddPageByFormPlugin extends Plugin
                         }
                     }
 
-                    // Store the route so it can be used to redirect to if needed
-                    $this->new_page_route = $parent_page_route . DS . $slug;
-
                     // Create and add the page to Grav
                     try {
-                        /** @var Pages $pages */
-                        $pages = $this->grav['pages'];
+
                         // Create new page
                         $new_page = new Page;
 
@@ -539,36 +566,72 @@ class AddPageByFormPlugin extends Plugin
                         // (e.g. 'nl' -> 'default.nl.md')
                         $language = Grav::instance()['language']->getLanguage() ?: null;
 
-                        // 18/01/20 DCN: Use $page_template not hard-wired "default"
+                        $extension = '.md';
+
                         if ($language != '') {
-                            $new_page->name($page_template . '.' . $language . '.md');
+                            $new_page_name = $page_template . '.' . $language . $extension;
                         } else {
-                            $new_page->name($page_template . '.md');
+                            $new_page_name = $page_template . $extension;
                         }
 
-                        $path = $parent_page_path . DS . $slug . DS . $new_page->name();
+                        $path = $parent_page_path . DS . $slug . DS . $new_page_name;
+                        $route = $parent_page_route . DS . $slug;
+
+                        // Set page location vars
+                        $new_page->name($new_page_name);
+                        $new_page->folder($slug);
+                        //$new_page->path($path);
+                        $new_page->extension($extension);
+                        $new_page->parent($parent_page);
                         $new_page->filePath($path);
+                        $new_page->routable(true);
+
+                        // Add frontmatter vars
+                        $new_page->header((object) $page_frontmatter);
+                        $new_page->frontmatter(Yaml::dump((array)$new_page->header(), 20));
+
+                        // Set page markdown content vars
                         $new_page->rawMarkdown((string) $content);
                         $new_page->file()->markdown($new_page->rawMarkdown());
+
+                        // Add routing information
+                        $pages->addPage($new_page, $this->new_page_route);
+
+
+                        // Fire BeforePageSave event
+                        $this->grav->fireEvent('onAddPageByFormPluginBeforePageSave', new Event(['page' => &$new_page]));
+
+                        // Set time vars
+                        $new_page->modified(time());
 
                         // First page save (required to have an existing new page folder
                         // to store any files with destination '@self' in)
                         $new_page->save();
 
-                        // Add page to Pages object with routing info
-                        $pages->addPage($new_page, $path);
+                        // Copy uploaded files to the new page folder
+                        $copy_files = $this->copyFiles($form, $new_page);
+                        // Get uploaded files plus properties
+                        $file_fields = $copy_files['uploaded'];
 
-                        // Support below and above version 1.6
-                        if (version_compare(GRAV_VERSION, '1.6', '<')) {
+                        // If original frontmatter exists update it to keep
+                        // already present page media
+                        if (isset($original_frontmatter)) {
 
-                            // Move uploaded files to the new page folder
-                            $file_fields = $this->moveFiles($form_page_relative_page_path, $parent_page_path, $slug);
+                            $file_fields_updated = array();
+                            foreach ($file_fields as $file_field => $uploads) {
+                                $file_fields_updated[$file_field] = array_merge($original_frontmatter[$file_field], $uploads);
 
-                        } else {
-
-                            // Copy uploaded files to the new page folder
-                            $file_fields = $this->copyFiles($form, $new_page);
-
+                                // Get any (uploaded and then) deleted files
+                                foreach ($copy_files['deleted'] as $file_to_delete) {
+                                    if (file_exists($file_to_delete['file_path'])) {
+                                        unlink($file_to_delete['file_path']);
+                                        if (in_array($file_to_delete['file_path'], $file_fields_updated[$file_field][$file_to_delete['file_path']])) {
+                                            unset($file_fields_updated[$file_field][$file_to_delete['file_path']]);
+                                        }
+                                    }
+                                }
+                            }
+                            $file_fields = $file_fields_updated;
                         }
 
                         // Add uploaded file properties to frontmatter
@@ -576,13 +639,19 @@ class AddPageByFormPlugin extends Plugin
                             $page_frontmatter = array_merge($page_frontmatter, $file_fields);
                         }
 
-                        // Add frontmatter to the page header
-                        $header = $page_frontmatter;
-                        $this->page_frontmatter = $page_frontmatter;
-                        $new_page->header((object) $header);
+                        // Add modified frontmatter to the page header
+                        $new_page->header((object) $page_frontmatter);
+                        $new_page->frontmatter(Yaml::dump((array)$new_page->header(), 20));
+
+                        // Set time vars
+                        $new_page->modified(time());
 
                         // Update the new page
                         $new_page->save();
+
+                        // Store the route so it can be used to redirect to if needed and to be saved as a Twig var
+                        $this->new_page_route = $route;
+                        $this->page_frontmatter = $page_frontmatter;
 
                         // Process any new taxonomy types
                         if ($auto_taxonomy_types && isset($page_frontmatter['taxonomy'])) {
@@ -613,6 +682,9 @@ class AddPageByFormPlugin extends Plugin
                             }
                         }
 
+                        // Fire AfterPageSave event
+                        $this->grav->fireEvent('onAddPageByFormPluginAfterPageSave', new Event(['page' => $new_page]));
+
                     } catch (\Exception $e) {
                         $this->grav['debugger']->addMessage($e->getMessage());
                         $this->grav->fireEvent('onFormValidationError', new Event([
@@ -623,7 +695,7 @@ class AddPageByFormPlugin extends Plugin
                     }
                 }
                 break;
-            case 'redirect':
+            case ($action == 'redirect'):
 
                 // The Form plugin does not know how to handle '@self' as a redirect
                 // or display parameter, so prepare the redirect to the new page
@@ -686,8 +758,8 @@ class AddPageByFormPlugin extends Plugin
         $session = $grav['session'];
 
         /*  if files have been uploaded and destination is 'self'
-        then prepare for moving the files to the new page
-        else do nothing
+            then prepare for moving the files to the new page
+            else do nothing
          */
         $this->move_self_files = false;
         $destination = $config->get('plugins.form.files.destination', '@self');
@@ -711,7 +783,7 @@ class AddPageByFormPlugin extends Plugin
                 foreach ($process as $action => $data) {
                     if (isset($action)) {
                         $action = \key($data);
-                        if ($action == $this->say_my_name) {
+                        if (in_array($action, $this->say_my_name)) {
                             $this->move_self_files = true;
                             break;
                         }
@@ -735,24 +807,62 @@ class AddPageByFormPlugin extends Plugin
      */
     public function onPageInitialized()
     {
-        $data = Yaml::parse($this->grav['page']->frontmatter());
-        // Only act upon forms which are intended to be processed by this plugin
-        if (isset($data['form']) && isset($data['form']['name']) &&
-            strtolower(substr($data['form']['name'], 0, 7)) == $this->say_my_name) {
+        // Some forms (like forgot_password) do not have frontmatter
+        if (null !== ($this->grav['page']->frontmatter())) {
+            $data = Yaml::parse($this->grav['page']->frontmatter());
+            // Only act upon forms which are intended to be processed by this plugin
+            if (isset($data['form']) && isset($data['form']['name']) &&
+                 in_array(strtolower(substr($data['form']['name'], 0, 7)), $this->say_my_name)) {
 
-            if ($this->config->get('plugins.add-page-by-form.use_editor_class',true)) {
-                $assets = $this->grav['assets'];
-                // Add jQuery library (no harm done when already present)
-                $assets->add('jquery', 101);
-                // Add SimpleMDE Markdown Editor
-                $assets->addCss('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.css', 100);
-                $assets->addJs('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.js', 100);
-                // Add custom styles
-                $assets->addCss('plugin://add-page-by-form/assets/css/customstyles.css', 110);
-                // Load inline Javascript code from configuration file
-                $assets->addInlineJs(file_get_contents('plugin://add-page-by-form/assets/js/simplemde_config.js'), 110);
+                if ($this->config->get('plugins.add-page-by-form.use_editor_class',true)) {
+                    $assets = $this->grav['assets'];
+                    // Add jQuery library (no harm done when already present)
+                    $assets->add('jquery', 101);
+                    // Add SimpleMDE Markdown Editor
+                    $assets->addCss('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.css', 100);
+                    $assets->addJs('//cdn.jsdelivr.net/simplemde/latest/simplemde.min.js', 100);
+                    // Add custom styles
+                    $assets->addCss('plugin://add-page-by-form/assets/css/customstyles.css', 110);
+                    // Load inline Javascript code from configuration file
+                    $assets->addInlineJs(file_get_contents('plugin://add-page-by-form/assets/js/simplemde_config.js'), 110);
+                }
             }
         }
+    }
+
+    /**
+     * Handle POST requests
+     *
+     * @param Event $e
+     */
+    public function onPagesInitialized(Event $e)
+    {
+        $page = $this->grav['page'];
+        $currentPageRoute = $page->route();
+
+        // Store POST parameters for filter functions
+        $this->post = !empty($_POST) ? $_POST : [];
+
+        if (!empty($this->post)) {
+
+            $action = $this->filter_post_var('action');
+            switch ($action) {
+                case 'add-page-by-form-edit':
+
+                    $nonce = $this->filter_post_var('form-nonce');
+                    if (!$this->values->get('form-nonce') || !Utils::verifyNonce($nonce, 'add-page-by-form-edit')) {
+                        $this->status = 'error';
+                        $event = new Event(['form' => $this,
+                            'message' => $grav['language']->translate('PLUGIN_FORM.NONCE_NOT_VALIDATED')
+                        ]);
+                        $grav->fireEvent('onFormValidationError', $event);
+        
+                        return;
+                    }
+                    break;
+            }
+        }
+
     }
 
     /**
@@ -785,6 +895,34 @@ class AddPageByFormPlugin extends Plugin
             $page = $this->grav['page']->find($route . DS . '_' . $slug);
         }
         return $page;
+    }
+
+    /**
+     * Generates a slug of the given string
+     * Source: Laravel str_slug()
+     *
+     * @param string $str
+     * @param string $separator (optional)
+     * @return string
+     */
+    public static function slug(string $str, string $separator = '-')
+    {
+
+        // Convert all dashes/underscores into separator
+        $flip = $separator === '-' ? '_' : '-';
+        $str = preg_replace('!['.preg_quote($flip).']+!u', $separator, $str);
+
+        // Replace @ with the word 'at'
+        $str = str_replace('@', $separator.'at'.$separator, $str);
+
+        // Remove all characters that are not the separator, letters, numbers, or whitespace.
+        $str = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', strtolower($str));
+
+        // Replace all separator characters and whitespace by a single separator
+        $str = preg_replace('!['.preg_quote($separator).'\s]+!u', $separator, $str);
+
+        return trim($str, $separator);
+
     }
 
     /**
