@@ -1,10 +1,26 @@
-# v2.4.1
+# v3.0.0
+
+##  05/03/2020
+
+1. [](#new)
+   - New 'overwrite_mode' option 'edit' allows for editing a page. Note: yet unfinished and undocumented.
+   - Removing upload files is now handled
+2. [](#bugfix)
+   - Switched to Laravel str_slug function to remedy problems with hyphens on some Windows systems
+3. [](#improved)
+   * (Possibly breaking change:) Changed uploaded files data structure from numeric array to associative array
+   * (Possibly breaking change:) Changed default setting of 'physical_template_name' to 'true'
+   * Minimum Grav version is set to 1.6
+
+# 2.4.1
+
 ##  04/12/2020
 
 1. [](#bugfix)
-    * Fixed a bug ([issue #52](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues/52)) where an empty value for the 'slug' variable would delete folder(s). Thanks to [anton-mellit](https://github.com/anton-mellit) for reporting this.
+   * Fixed a bug ([issue #52](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues/52)) where an empty value for the 'slug' variable would delete folder(s). Thanks to [anton-mellit](https://github.com/anton-mellit) for reporting this.
 
 # v2.4.0
+
 ##  01/28/2020
 
 1. [](#new)

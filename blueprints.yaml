@@ -1,5 +1,5 @@
 name: Add Page By Form
-version: 2.4.1
+version: 2.4.0
 description: Adds a page by means of a form
 icon: plus-square-o
 author:
@@ -10,6 +10,9 @@ keywords: grav, plugin, page, form, frontmatter
 bugs: https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues
 docs: https://github.com/bleutzinn/grav-plugin-add-page-by-form/blob/master/README.md
 license: MIT
+
+dependencies:
+  - { name: grav, version: '>=1.6.0' }
 
 form:
   validation: strict
@@ -46,16 +49,15 @@ form:
       validate:
            type: bool
     overwrite_mode:
-      type: toggle
+      type: select
       label: Overwrite mode
       help: Overwrite existing page
       highlight: 0
-      default: 0
+      default: false
       options:
-          1: Enabled
-          0: Disabled
-      validate:
-           type: bool
+          'false': Disabled
+          'true': Enabled
+          edit: Edit
     auto_taxonomy_types:
       type: toggle
       label: Add new taxonomy types
@@ -71,7 +73,7 @@ form:
       type: toggle
       label: Use the editor class
       help: When set, adding class=editor to a textarea provides the simpleMDE editor on that area
-      highlight: 0
+      highlight: 1
       default: 1
       options:
         1: Enabled
@@ -97,9 +99,9 @@ form:
     physical_template_name:
       type: toggle
       label: Physical template name
-      help: Use the template name as the physical filename of the new page
-      highlight: 0
-      default: 0
+      help: Use the template name in the filename of the new page
+      highlight: 1
+      default: 1
       options:
           1: Enabled
           0: Disabled

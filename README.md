@@ -42,20 +42,18 @@ overwrite_mode: false
 include_username: false
 auto_taxonomy_types: false
 use_editor_class: true
-physical_template_name: false
+physical_template_name: true
 ```
-- `enabled: true|false` determines whether the plugin is active or not;
-- `date_display_format` sets a default date and time format
-
-The next settings are also available from the Adminstration Panel:
-
+- `enabled` determines whether the plugin is active or not;
+- `date_display_format` sets a default date and time format;
 - `default_title` will be used as a fallback for the new page title when no other value is set;
+
 - `default_content` will be used as the page content for the new page when no other value is set;
-- `include_username` when set to `true` the logged in frontend user username is added to the new page frontmatter;
-- `overwrite_mode` if `true` the new page will replace a page by the same name or slug if it exists. Both page content and media will be overwritten;
+- `include_username` sets whether or not the username of the currently logged in frontend user is included in the new page frontmatter;
+- `overwrite_mode` determines how to act when a page with the same name or slug already exists;
 - `auto_taxonomy_types` saves any new taxonomy types that were input by the user to the site configuration file `site.yaml`;
-- `use_editor_class` if `true` then adding `class=editor` to a form textarea provides the simpleMDE editor on that area, if `false` the simpleMDE and related assets are not loaded, useful to reduce assets overhead if its known it will not be used;
-- `physical_template_name` if `true` the template name is used for the physical filesystem filename of the new page plus the language extension (if any) and the standard Markdown extension `.md`.
+- `use_editor_class` determines to change a textarea field into a Markdown editor;
+- `physical_template_name` should normally not be used. For more information see the description in the section 'pageconfig' block variables.
 
 
 ### Customizing the default configuration
@@ -69,7 +67,7 @@ Simply edit the plugin options in the Admin panel and the changes will be saved 
 
 Using this plugin requires:
 
-- a normal page containing a Grav Form with a unique name that starts with "addpage";
+- a normal page containing a Grav Form with a unique name that starts with "add_page";
 - optionally, but required for usefulness, one or two blocks of extra page frontmatter variables in that page being:
 	-  a 'pageconfig' block with variables that are used in the new page creation process;
 	-  a 'pagefrontmatter' block with variables that are passed on to the new page frontmatter and can be processed by Twig along the way. 
@@ -86,7 +84,7 @@ The basic method of modifying is overriding or replacing an initial value. An ex
 4. and finally may be changed again by the end user when the form contains an `overwrite_mode` field.
 
 ### Page Headers / Frontmatter
-This plugin makes extensive use of [Custom Page Headers](https://learn.getgrav.org/content/headers#custom-page-headers). The Grav documentation mixes the terms "frontmatter", "page headers" and simply "headers". This may be confusing at first. They [all](https://learn.getgrav.org/content/headers) refer to the optional top part of a Grav page which contains data in [YAML syntax](https://learn.getgrav.org/advanced/yaml).
+This plugin makes extensive use of [Custom Page Headers](https://learn.getgrav.org/content/headers#custom-page-headers). Unfortunately the Grav documentation mixes the terms "frontmatter", "page headers" and simply "headers". This may be confusing at first. They [all](https://learn.getgrav.org/content/headers) refer to the optional top part of a Grav page which contains data in [YAML syntax](https://learn.getgrav.org/advanced/yaml).
 
 
 ## Form page Frontmatter
@@ -99,7 +97,8 @@ The form page frontmatter is divided into three sections or blocks:
 2. the `pageconfig` block contains variables that are used by the plugin in the new page creation process and do get passed on to the new page frontmatter;
 3. the `pagefrontmatter` block holds all other variables that must be passed on to the new page frontmatter.
 
-### Root level frontmatter
+### Root level variables
+
 In the examples above the root level configuration options are:
 
 - `title` sets the title of the page containing the form;
@@ -108,15 +107,17 @@ In the examples above the root level configuration options are:
 
 From version 2, the use of `parent` in the, what is now called, root level block is deprecated. It is however still supported for backwards compatibility.
 
-### 'pageconfig' block frontmatter
+### 'pageconfig' block variables
+
 In the optional pageconfig block you can set these, and only these, variables (other variables will be ignored):
 
 - `parent` sets the parent page for the new page. This variable may be an absolute route (for example `parent: /user_contributions`) or a relative route (e.g. `parent: articles`. In case of an absolute route this route starts from the pages root. A relative route is regarded to start from the form page, so the new page will be a child page of the form page. The form page is also used as the parent page when the set parent page does not exist;
 - `subroute` defines a route from the (initial) parent value. If one or more folders in the route do not exist they will be created; 
 - `slug_field` tells the plugin what field to use as the new page's slug or folder name. When `slug_field` is missing the plugin tries to use the value of `title`;
-- `overwrite_mode: true|false` (default false) tells the plugin what to do when a page with the same name already exists. With `overwrite_mode: true` the existing page is overwritten. Any additional (media) files besides the page itself which are stored in the existing page folder are deleted as well. With `overwite_mode: false` the new page slug gets a sequential number attached at the end (for example "my-new-page-1" in case "my-new-page" exists);
-- `include_username: true|false` (default false) determines whether or not to include the username of a logged in frontend user in the new page frontmatter;
-- `physical_template_name: true|false` (default false) does or does not cause the plugin to use the template name of the new page as that new page's filesystem filename. Note that to avoid future confusion the frontmatter variable `template` is removed from the new page frontmatter.
+- `overwrite_mode: true|false|edit` (default `false`) tells the plugin what to do when a page with the same name already exists. With `overwrite_mode: true` the existing page is overwritten. Any additional (media) files besides the page itself which are stored in the existing page folder are deleted as well. With `overwite_mode: false` the new page slug gets a sequential number attached at the end (for example "my-new-page-1" in case "my-new-page" exists).   
+  Using `overwite_mode: edit` allows for the page being saved to it's existing folder respecting any already present uploaded files;
+- `include_username: true|false` (default `false`) determines whether or not to include the username of a logged in frontend user in the new page frontmatter;
+- `physical_template_name: true|false` (default `true`) does or does not cause the plugin to use the template name of the new page as that new page's filesystem filename. Defaults to "default" when no template is set in the 'pagefrontmatter' block. When set to `true` to avoid future confusion the frontmatter variable `template` is removed from the new page frontmatter.
 
 #### A note on parent and subroute
 
@@ -127,7 +128,8 @@ The difference between parent and subroute worded in another way:
 - Parent: works on a page level; when there is no page at the parent route, the form page is used as the parent;
 - Subroute: works on a folder level; a subroute may consist of empty folders and if a folder in the subroute does not exist it gets created.
 
-### 'pagefrontmatter' block frontmatter
+### 'pagefrontmatter' block variables
+
 The content of the optional `pagefrontmatter` block will be included in the new page frontmatter.
 
 
