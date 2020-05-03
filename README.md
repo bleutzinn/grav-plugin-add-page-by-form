@@ -333,11 +333,11 @@ instructor:
 name: 'Paul Walker'
 title: 'CMPT363 E100'
 attachments:
-  -
+  /Users/rwgc/devroot/repos/grav-test/htdocs/user/pages/assignments/cmpt363-e100/drafts/cmpt363-e100-1/scrum-guide-sept-2013.pdf
     name: scrum-guide-sept-2013.pdf
     type: application/pdf
     size: 273 KB
-    path: /user/pages/assignments/cmpt363-e100/drafts/cmpt363-e100-1/scrum-guide-sept-2013.pdf
+    path: /Users/rwgc/devroot/repos/grav-test/htdocs/user/pages/assignments/cmpt363-e100/drafts/cmpt363-e100-1/scrum-guide-sept-2013.pdf
 ---
 
 q.e.d.
@@ -382,7 +382,7 @@ pagefrontmatter:
         category: blog
         tag: [journal, guest]
 form:
-    name: addpage.blogpost
+    name: add_page.blogpost
     fields:
         -
             name: author
@@ -419,7 +419,7 @@ form:
             value: Submit
     process:
         -
-            addpage: null
+            add_page: true
         -
             redirect: '/blog'
 ---
