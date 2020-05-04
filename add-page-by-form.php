@@ -278,19 +278,10 @@ class AddPageByFormPlugin extends Plugin
     public static function getSubscribedEvents()
     {
 
-        // Support below and above version 1.6
-        if (version_compare(GRAV_VERSION, '1.6', '<')) {
-            return [
-                'onPluginsInitialized' => ['onPluginsInitialized', 0],
-                'onFormValidationProcessed' => ['onFormValidationProcessed', 0],
-                'onFormProcessed' => ['onFormProcessed', 0]
-            ];
-        } else {
-            return [
-                'onPluginsInitialized' => ['onPluginsInitialized', 0],
-                'onFormProcessed' => ['onFormProcessed', 0]
-            ];
-        }
+        return [
+            'onPluginsInitialized' => ['onPluginsInitialized', 0],
+            'onFormProcessed' => ['onFormProcessed', 0]
+        ];
 
     }
 
@@ -319,9 +310,14 @@ class AddPageByFormPlugin extends Plugin
                     // Get default settings form plugin config
                     $include_username = $this->config->get('plugins.add-page-by-form.include_username');
                     $overwrite_mode = $this->config->get('plugins.add-page-by-form.overwrite_mode');
-                    // Convert overwrite_mode to boolean if appropriate
+                    // Convert overwrite_mode to string if needed
                     if($overwrite_mode != 'edit') {
-                        $overwrite_mode = (bool) $overwrite_mode;
+                        if($overwrite_mode) {
+                            $overwrite_mode = 'true';
+                        }
+                        else {
+                            $overwrite_mode = 'false';
+                        }
                     }
                     $date_format = $this->config->get('plugins.add-page-by-form.date_display_format');
                     $auto_taxonomy_types = $this->config->get('plugins.add-page-by-form.auto_taxonomy_types');
@@ -353,6 +349,12 @@ class AddPageByFormPlugin extends Plugin
                             $overwrite_mode = strtolower(trim($pageconfig['overwrite_mode']));
                             if ($overwrite_mode != 'edit') {
                                 $overwrite_mode = in_array(strtolower(trim($pageconfig['overwrite_mode'])), $positives);
+                                if($overwrite_mode) {
+                                    $overwrite_mode = 'true';
+                                }
+                                else {
+                                    $overwrite_mode = 'false';
+                                }
                             }
                         }
                         if (isset($pageconfig['slug_field'])) {
@@ -737,66 +739,6 @@ class AddPageByFormPlugin extends Plugin
                     $this->grav->redirect($route);
                 }
                 break;
-        }
-    }
-
-    /**
-     * Process form after validation
-     *
-     * @deprecated 2.3 For use with pre Grav version 1.6 only
-     *
-     * @param $event
-     *
-     */
-    public function onFormValidationProcessed(Event $event)
-    {
-        $grav = Grav::instance();
-        $config = $grav['config'];
-        $form = $event['form'];
-        $uri = $grav['uri']->url;
-        $session = $grav['session'];
-
-        /*  if files have been uploaded and destination is 'self'
-            then prepare for moving the files to the new page
-            else do nothing
-         */
-        $this->move_self_files = false;
-        $destination = $config->get('plugins.form.files.destination', '@self');
-        // Get queue from session
-        $queue = $session->getFlashObject('files-upload');
-        $this_queue = $queue[base64_encode($uri)];
-        if ($this_queue) {
-            $form_data = $form->toArray();
-            $process = isset($form_data['process']) ? $form_data['process'] : [];
-            $form_def = $grav['page']->header()->form;
-            $fields = $form_def['fields'];
-            // Just a single destination self will trigger the handling by this plugin
-            // otherwise, the files move is handed over to the Form Plugin
-            foreach ($fields as $array) {
-                if (array_key_exists('destination', $array)) {
-                    $destination = $array['destination'];
-                    break;
-                }
-            }
-            if (is_array($process)) {
-                foreach ($process as $action => $data) {
-                    if (isset($action)) {
-                        $action = \key($data);
-                        if (in_array($action, $this->say_my_name)) {
-                            $this->move_self_files = true;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        if (($destination === '@self' || $destination === 'self@') && $this->move_self_files) {
-            // Save uploaded files properties to process in onFormProcessed()
-            $this->uploads[] = $this_queue;
-        } else {
-            // Restore queue in session again and let form plugin do the upload
-            $session->setFlashObject('files-upload', $queue);
-            $this->move_self_files = false;
         }
     }
 
