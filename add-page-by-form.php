@@ -482,10 +482,21 @@ class AddPageByFormPlugin extends Plugin
                     $parent_page_path = $parent_page->path();
                     $parent_page_route = $parent_page->route();
 
-                    // overwrite_mode == 'edit' needs more work to become generic !!!
                     if ($overwrite_mode == 'edit') {
-                        // Get slug from exisiting page
-                        $slug = basename(dirname($form_data['file_path']));
+                        // Get slug of exisiting page
+                        // Normal method
+                        if(isset($form_data['edit_path'])) {
+                            $slug = basename(dirname($form_data['edit_path']));
+                        }
+                        else {
+                            // Alternative method
+                            if(isset($form_data['file_path'])) {
+                                $slug = basename(dirname($form_data['file_path']));
+                            }
+                            else {
+                                $slug = '';
+                            }
+                        }
                     }
                     else {
                         // Create the slug for the new page
@@ -532,9 +543,9 @@ class AddPageByFormPlugin extends Plugin
                     $new_page_folder = $parent_page_path . DS . $slug;
 
                     // Check overwrite mode
-                    //  When overwrite mode == true: replace page including media
-                    //  When overwrite mode == false: create a sequential named page
-                    //  When overwrite mode == 'edit': edit page and page media
+                    //  When overwrite mode == 'true' replace page including media
+                    //  When overwrite mode == 'false' create a sequential named page
+                    //  When overwrite mode == 'edit' edit page and page media
                     if ($overwrite_mode) {
                         if (file_exists($new_page_folder)) {
                             if ($overwrite_mode == 'edit') {
@@ -769,41 +780,6 @@ class AddPageByFormPlugin extends Plugin
                 }
             }
         }
-    }
-
-    /**
-     * Handle POST requests
-     *
-     * @param Event $e
-     */
-    public function onPagesInitialized(Event $e)
-    {
-        $page = $this->grav['page'];
-        $currentPageRoute = $page->route();
-
-        // Store POST parameters for filter functions
-        $this->post = !empty($_POST) ? $_POST : [];
-
-        if (!empty($this->post)) {
-
-            $action = $this->filter_post_var('action');
-            switch ($action) {
-                case 'add-page-by-form-edit':
-
-                    $nonce = $this->filter_post_var('form-nonce');
-                    if (!$this->values->get('form-nonce') || !Utils::verifyNonce($nonce, 'add-page-by-form-edit')) {
-                        $this->status = 'error';
-                        $event = new Event(['form' => $this,
-                            'message' => $grav['language']->translate('PLUGIN_FORM.NONCE_NOT_VALIDATED')
-                        ]);
-                        $grav->fireEvent('onFormValidationError', $event);
-        
-                        return;
-                    }
-                    break;
-            }
-        }
-
     }
 
     /**
