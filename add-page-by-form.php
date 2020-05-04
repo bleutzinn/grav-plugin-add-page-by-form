@@ -101,7 +101,7 @@ class AddPageByFormPlugin extends Plugin
                         // Leave the copy to the Form plugin
                     }
 
-                    $file_fields[$file_field][$full_name] = [
+                    $file_fields[$file_field][$file_name] = [
                         'name' => $file_name,
                         'type' => $upload->getClientMediaType(),
                         'size' => $upload->getSize(),
@@ -626,8 +626,8 @@ class AddPageByFormPlugin extends Plugin
                                 foreach ($copy_files['deleted'] as $file_to_delete) {
                                     if (file_exists($file_to_delete['file_path'])) {
                                         unlink($file_to_delete['file_path']);
-                                        if (in_array($file_to_delete['file_path'], $file_fields_updated[$file_field][$file_to_delete['file_path']])) {
-                                            unset($file_fields_updated[$file_field][$file_to_delete['file_path']]);
+                                        if (in_array($file_to_delete['file_path'], $file_fields_updated[$file_field][basename($file_to_delete['file_path'])])) {
+                                            unset($file_fields_updated[$file_field][basename($file_to_delete['file_path'])]);
                                         }
                                     }
                                 }
