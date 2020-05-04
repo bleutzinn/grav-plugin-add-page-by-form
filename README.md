@@ -298,7 +298,6 @@ form:
             label: 'Attachment (PDF only)'
             type: file
             multiple: true
-            destination: '@self'
             accept:
                 - application/pdf
             validate:
@@ -409,7 +408,6 @@ form:
             multiple: true
             accept:
                 - 'image/*'
-            destination: '@self'
         -
             name: honeypot
             type: honeypot
