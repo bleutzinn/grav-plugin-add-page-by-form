@@ -55,8 +55,8 @@ form:
       highlight: 0
       default: false
       options:
-          'false': Disabled
-          'true': Enabled
+          0: Disabled
+          1: Enabled
           edit: Edit
     auto_taxonomy_types:
       type: toggle
