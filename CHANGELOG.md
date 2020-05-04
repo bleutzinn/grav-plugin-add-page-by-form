@@ -3,7 +3,7 @@
 ##  05/03/2020
 
 1. [](#new)
-   - New 'overwrite_mode' option 'edit' allows for editing a page. Note: yet unfinished and undocumented.
+   - New 'overwrite_mode' option 'edit' allows for editing a page. Note: yet undocumented.
    - Removing upload files is now handled
 2. [](#bugfix)
    - Switched to Laravel str_slug function to remedy problems with hyphens on some Windows systems
