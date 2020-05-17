@@ -1,3 +1,9 @@
+# v3.0.2
+##  05/17/2020
+
+1. [](#improved)
+   - Yet another release. This time just to synchronize the versioning number in 'bleuprints.yaml' and this Changelog. For interesting changes see v3.0.0.
+
 # v3.0.1
 ##  05/17/2020
 
@@ -17,7 +23,7 @@
    * (Possibly breaking change:) Changed default setting of 'physical_template_name' to 'true'
    * Minimum Grav version is set to 1.6
 
-# 2.4.1
+# v2.4.1
 ##  04/12/2020
 
 1. [](#bugfix)
