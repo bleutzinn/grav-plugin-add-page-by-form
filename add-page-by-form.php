@@ -286,6 +286,43 @@ class AddPageByFormPlugin extends Plugin
     }
 
     /**
+     * @return string
+     * 
+     * Return the state of a tristate configuration variable
+     * 
+     */
+    public function getTriStateConfig($value, $state) {
+    
+        if(!isset($value)) {
+            return '';
+        }
+
+        if($value === $state) {
+            return $state;
+        }
+
+        if(gettype($value) === "boolean") {
+            if($value) {
+                return "true";
+            }
+            else {
+                return "false";
+            }
+        }
+    
+        if(gettype($value) === "string") {
+            $value = trim(strtolower($value));
+        };
+        
+        if(in_array($value, [1, '1', 'on', 'true'], true)) {
+            return 'true';
+        }
+        else {
+            return 'false';
+        }
+    }
+
+    /**
      * Handle form action
      *
      * @param $event
@@ -309,16 +346,9 @@ class AddPageByFormPlugin extends Plugin
 
                     // Get default settings form plugin config
                     $include_username = $this->config->get('plugins.add-page-by-form.include_username');
-                    $overwrite_mode = $this->config->get('plugins.add-page-by-form.overwrite_mode');
-                    // Convert overwrite_mode to string if needed
-                    if($overwrite_mode != 'edit') {
-                        if($overwrite_mode) {
-                            $overwrite_mode = 'true';
-                        }
-                        else {
-                            $overwrite_mode = 'false';
-                        }
-                    }
+
+                    $overwrite_mode = $this->getTriStateConfig($this->config->get('plugins.add-page-by-form.overwrite_mode'), 'edit');
+
                     $date_format = $this->config->get('plugins.add-page-by-form.date_display_format');
                     $auto_taxonomy_types = $this->config->get('plugins.add-page-by-form.auto_taxonomy_types');
                     $physical_template_name = $this->config->get('plugins.add-page-by-form.physical_template_name');
@@ -334,7 +364,6 @@ class AddPageByFormPlugin extends Plugin
                     // Get settings from pageconfig block and override values via form fields
                     if (isset($header->pageconfig) && is_array($header->pageconfig)) {
                         $pageconfig = $header->pageconfig;
-                        $positives = ['1', 'on', 'true'];
 
                         if (isset($pageconfig['parent'])) {
                             $parent = strtolower(trim($pageconfig['parent']));
@@ -346,16 +375,7 @@ class AddPageByFormPlugin extends Plugin
                             $include_username = in_array(strtolower(trim($pageconfig['include_username'])), $positives);
                         }
                         if (isset($pageconfig['overwrite_mode'])) {
-                            $overwrite_mode = strtolower(trim($pageconfig['overwrite_mode']));
-                            if ($overwrite_mode != 'edit') {
-                                $overwrite_mode = in_array(strtolower(trim($pageconfig['overwrite_mode'])), $positives);
-                                if($overwrite_mode) {
-                                    $overwrite_mode = 'true';
-                                }
-                                else {
-                                    $overwrite_mode = 'false';
-                                }
-                            }
+                            $overwrite_mode = $this->getTriStateConfig($pageconfig['overwrite_mode'], 'edit');
                         }
                         if (isset($pageconfig['slug_field'])) {
                             $slug_field = strtolower(trim($pageconfig['slug_field']));
@@ -365,8 +385,8 @@ class AddPageByFormPlugin extends Plugin
                         }
                     }
 
-                    // Assemble the new page frontmatter from the page_frontmatter block as set in
-                    // the form page
+                    // Assemble the new page frontmatter from the page_frontmatter block
+                    // as set in the form page
                     if (isset($header->pagefrontmatter) && is_array($header->pagefrontmatter)) {
                         $page_frontmatter = $header->pagefrontmatter;
                     } else {
@@ -482,7 +502,7 @@ class AddPageByFormPlugin extends Plugin
                     $parent_page_path = $parent_page->path();
                     $parent_page_route = $parent_page->route();
 
-                    if ($overwrite_mode == 'edit') {
+                    if ($overwrite_mode === 'edit') {
                         // Get slug of exisiting page
                         // Normal method
                         if(isset($form_data['edit_path'])) {
@@ -546,9 +566,9 @@ class AddPageByFormPlugin extends Plugin
                     //  When overwrite mode == 'true' replace page including media
                     //  When overwrite mode == 'false' create a sequential named page
                     //  When overwrite mode == 'edit' edit page and page media
-                    if ($overwrite_mode) {
+                    if ($overwrite_mode !== 'false') {
                         if (file_exists($new_page_folder)) {
-                            if ($overwrite_mode == 'edit') {
+                            if ($overwrite_mode === 'edit') {
                                 $original_frontmatter = (array)$pages->get($new_page_folder)->header();
                             }
                             else {
@@ -567,7 +587,7 @@ class AddPageByFormPlugin extends Plugin
                             $slug = $slug . '-' . $version;
                         }
                     }
-
+                    
                     // Create and add the page to Grav
                     try {
 
