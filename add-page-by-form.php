@@ -363,6 +363,8 @@ class AddPageByFormPlugin extends Plugin
 
                     // Get settings from pageconfig block and override values via form fields
                     if (isset($header->pageconfig) && is_array($header->pageconfig)) {
+
+                        $positives = ['1', 'on', 'true'];
                         $pageconfig = $header->pageconfig;
 
                         if (isset($pageconfig['parent'])) {
