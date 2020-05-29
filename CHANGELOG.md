@@ -1,3 +1,9 @@
+# v3.0.3
+##  05/29/2020
+
+1. [](#bugfix)
+   - Fixed not handling overwrite_mode setting properly, issue [#54](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues/54), thanks to mooomooo for reporting and testing
+   
 # v3.0.2
 ##  05/17/2020
 
