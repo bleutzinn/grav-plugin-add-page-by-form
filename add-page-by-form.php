@@ -846,7 +846,8 @@ class AddPageByFormPlugin extends Plugin
      */
     public static function slug(string $str, string $separator = '-')
     {
-
+         // Sanitize non-latin characters
+        $str = self::sanitize($str);
         // Convert all dashes/underscores into separator
         $flip = $separator === '-' ? '_' : '-';
         $str = preg_replace('!['.preg_quote($flip).']+!u', $separator, $str);
