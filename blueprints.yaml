@@ -1,10 +1,10 @@
 name: Add Page By Form
-version: 3.0.3
+version: 3.0.4
 description: Adds a page by means of a form
 icon: plus-square-o
 author:
   name: Ron Wardenier
-  email: ron@rwgc.nl
+  email: ron@wardenier.com
 homepage: https://github.com/bleutzinn/grav-plugin-add-page-by-form
 keywords: grav, plugin, page, form, frontmatter
 bugs: https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues

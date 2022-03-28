@@ -1,3 +1,9 @@
+# v3.0.4
+##  03/28/2022
+
+1. [](#bugfix)
+   - A title containing diacritic characters prevented a form submit (issues [#56](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues/56) and [#60](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues/60)). Thanks goes to davay for the pull request.
+   
 # v3.0.3
 ##  05/29/2020
 
