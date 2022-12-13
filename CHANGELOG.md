@@ -1,3 +1,12 @@
+# v3.1.0
+##  12/13/2022
+
+1. [](#improved)
+   - Tested with PHP version 8 (8.1.10)
+   - Fixed some incorrect variable types in PHPDoc Comments
+1. [](#bugfix)
+   - Changed the declaration of the function `sanitize` to "static". [#62](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues/62)). Thanks to masetto for raising this issue.
+
 # v3.0.4
 ##  03/28/2022
 
