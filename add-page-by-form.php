@@ -1,4 +1,5 @@
 <?php
+
 namespace Grav\Plugin;
 
 use Grav\Common\Filesystem\Folder;
@@ -29,11 +30,11 @@ class AddPageByFormPlugin extends Plugin
     /**
      * Extends a path
      *
-     * @param string $path
-     * @param string $page
-     * @param string $slug
+     * @param string path
+     * @param mixed page
+     * @param string slug
      *
-     * @return string $path
+     * @return string
      */
     public function buildPath($path, $page, $slug)
     {
@@ -48,7 +49,7 @@ class AddPageByFormPlugin extends Plugin
      * Extends a route
      *
      * @param string $route
-     * @param string $page
+     * @param mixed $page
      * @param string $slug
      *
      * @return string $route
@@ -65,8 +66,8 @@ class AddPageByFormPlugin extends Plugin
     /**
      * Copy uploaded files and return list of properties
      *
-     * @param string $form
-     * @param string $new_page
+     * @param mixed $form
+     * @param mixed $new_page
      *
      * @return array $file_fields
      */
@@ -107,8 +108,7 @@ class AddPageByFormPlugin extends Plugin
                         'size' => $upload->getSize(),
                         'path' => $full_name
                     ];
-                }
-                else {
+                } else {
                     // Uploaded file was removed by the user
                     $to_be_deleted = $new_page_path . DS . $file_name;
                     array_push($deleted_files, array('file_field' => $file_field, 'file_path' => $to_be_deleted));
@@ -177,17 +177,18 @@ class AddPageByFormPlugin extends Plugin
 
 
     /**
-    * Custom filter_var
-    *
-    * Based upon: https://gist.github.com/chtombleson/10002134
-    * Get a value from $_POST and sanitize it
-    *
-    * @param string $var    Variable to check
-    * @param string $type   What type is the value (string, email, int, float, encoded, url, email)
-    * @param array  $option Options for filter_var
-    * @return mixed will return false on failure
-    */
-    public function filter_post_var($var, $type = 'string', $options = array()) {
+     * Custom filter_var
+     *
+     * Based upon: https://gist.github.com/chtombleson/10002134
+     * Get a value from $_POST and sanitize it
+     *
+     * @param string $var    Variable to check
+     * @param string $type   What type is the value (string, email, int, float, encoded, url, email)
+     * @param array  $option Options for filter_var
+     * @return mixed will return false on failure
+     */
+    public function filter_post_var($var, $type = 'string', $options = array())
+    {
         if (!isset($this->post[$var])) {
             return false;
         }
@@ -199,7 +200,8 @@ class AddPageByFormPlugin extends Plugin
      * Source: https://gist.github.com/chtombleson/10002134
      *
      */
-    private function get_filter($type) {
+    private function get_filter($type)
+    {
         switch (strtolower($type)) {
             case 'string':
                 $filter = FILTER_SANITIZE_STRING;
@@ -282,7 +284,6 @@ class AddPageByFormPlugin extends Plugin
             'onPluginsInitialized' => ['onPluginsInitialized', 0],
             'onFormProcessed' => ['onFormProcessed', 0]
         ];
-
     }
 
     /**
@@ -291,33 +292,32 @@ class AddPageByFormPlugin extends Plugin
      * Return the state of a tristate configuration variable
      * 
      */
-    public function getTriStateConfig($value, $state) {
-    
-        if(!isset($value)) {
+    public function getTriStateConfig($value, $state)
+    {
+
+        if (!isset($value)) {
             return '';
         }
 
-        if($value === $state) {
+        if ($value === $state) {
             return $state;
         }
 
-        if(gettype($value) === "boolean") {
-            if($value) {
+        if (gettype($value) === "boolean") {
+            if ($value) {
                 return "true";
-            }
-            else {
+            } else {
                 return "false";
             }
         }
-    
-        if(gettype($value) === "string") {
+
+        if (gettype($value) === "string") {
             $value = trim(strtolower($value));
         };
-        
-        if(in_array($value, [1, '1', 'on', 'true'], true)) {
+
+        if (in_array($value, [1, '1', 'on', 'true'], true)) {
             return 'true';
-        }
-        else {
+        } else {
             return 'false';
         }
     }
@@ -443,7 +443,6 @@ class AddPageByFormPlugin extends Plugin
                         // Values that have been through a Twig Processor are in the
                         // page_frontmatter and take precedence over the form values
                         $page_frontmatter = array_merge($page_frontmatter, $form_data);
-
                     }
 
                     // Here you can insert anything else into the new page frontmatter
@@ -507,20 +506,17 @@ class AddPageByFormPlugin extends Plugin
                     if ($overwrite_mode === 'edit') {
                         // Get slug of exisiting page
                         // Normal method
-                        if(isset($form_data['edit_path'])) {
+                        if (isset($form_data['edit_path'])) {
                             $slug = basename(dirname($form_data['edit_path']));
-                        }
-                        else {
+                        } else {
                             // Alternative method
-                            if(isset($form_data['file_path'])) {
+                            if (isset($form_data['file_path'])) {
                                 $slug = basename(dirname($form_data['file_path']));
-                            }
-                            else {
+                            } else {
                                 $slug = '';
                             }
                         }
-                    }
-                    else {
+                    } else {
                         // Create the slug for the new page
                         // Override subroute
                         if (isset($form_data['subroute'])) {
@@ -557,7 +553,8 @@ class AddPageByFormPlugin extends Plugin
                     if (empty($slug)) {
                         $this->grav->fireEvent('onFormValidationError', new Event([
                             'form' => $form,
-                            'message' => '<strong>ERROR</strong> in Add Page by Form Plugin: Variable \'slug\' is empty']));
+                            'message' => '<strong>ERROR</strong> in Add Page by Form Plugin: Variable \'slug\' is empty'
+                        ]));
                         $event->stopPropagation();
                         return;
                     }
@@ -572,8 +569,7 @@ class AddPageByFormPlugin extends Plugin
                         if (file_exists($new_page_folder)) {
                             if ($overwrite_mode === 'edit') {
                                 $original_frontmatter = (array)$pages->get($new_page_folder)->header();
-                            }
-                            else {
+                            } else {
                                 Folder::delete($new_page_folder);
                             }
                         }
@@ -589,7 +585,7 @@ class AddPageByFormPlugin extends Plugin
                             $slug = $slug . '-' . $version;
                         }
                     }
-                    
+
                     // Create and add the page to Grav
                     try {
 
@@ -718,12 +714,12 @@ class AddPageByFormPlugin extends Plugin
 
                         // Fire AfterPageSave event
                         $this->grav->fireEvent('onAddPageByFormPluginAfterPageSave', new Event(['page' => $new_page]));
-
                     } catch (\Exception $e) {
                         $this->grav['debugger']->addMessage($e->getMessage());
                         $this->grav->fireEvent('onFormValidationError', new Event([
                             'form' => $form,
-                            'message' => '<strong>ERROR:</strong> ' . $e->getMessage()]));
+                            'message' => '<strong>ERROR:</strong> ' . $e->getMessage()
+                        ]));
                         $event->stopPropagation();
                         return;
                     }
@@ -785,10 +781,12 @@ class AddPageByFormPlugin extends Plugin
         if (null !== ($this->grav['page']->frontmatter())) {
             $data = Yaml::parse($this->grav['page']->frontmatter());
             // Only act upon forms which are intended to be processed by this plugin
-            if (isset($data['form']) && isset($data['form']['name']) &&
-                 in_array(strtolower(substr($data['form']['name'], 0, 7)), $this->say_my_name)) {
+            if (
+                isset($data['form']) && isset($data['form']['name']) &&
+                in_array(strtolower(substr($data['form']['name'], 0, 7)), $this->say_my_name)
+            ) {
 
-                if ($this->config->get('plugins.add-page-by-form.use_editor_class',true)) {
+                if ($this->config->get('plugins.add-page-by-form.use_editor_class', true)) {
                     $assets = $this->grav['assets'];
                     // Add jQuery library (no harm done when already present)
                     $assets->add('jquery', 101);
@@ -848,41 +846,44 @@ class AddPageByFormPlugin extends Plugin
     {
         // Sanitize non-latin characters
         $str = self::sanitize($str, 'slug');
-        
+
         // Convert all dashes/underscores into separator
         $flip = $separator === '-' ? '_' : '-';
-        $str = preg_replace('!['.preg_quote($flip).']+!u', $separator, $str);
+        $str = preg_replace('![' . preg_quote($flip) . ']+!u', $separator, $str);
 
         // Replace @ with the word 'at'
-        $str = str_replace('@', $separator.'at'.$separator, $str);
+        $str = str_replace('@', $separator . 'at' . $separator, $str);
 
         // Remove all characters that are not the separator, letters, numbers, or whitespace.
-        $str = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', strtolower($str));
+        $str = preg_replace('![^' . preg_quote($separator) . '\pL\pN\s]+!u', '', strtolower($str));
 
         // Replace all separator characters and whitespace by a single separator
-        $str = preg_replace('!['.preg_quote($separator).'\s]+!u', $separator, $str);
+        $str = preg_replace('![' . preg_quote($separator) . '\s]+!u', $separator, $str);
 
         return trim($str, $separator);
-
     }
 
     /**
      * Sanitize a string into a safe filename or slug
+     * Using $type:
+     *   'file': Create a valid filename string, allowing hyphens ("-") and dots (".")
+     *   any other value: Create a string without dots e.g. to create a safe URL page name (slug)
+     * 
+     * A combination of various methods to sanitize a string while retaining
+     * the "essence" of the original string as much as possible.
+     * Note: unsuitable for file paths as '/' and '\' are filtered out.
+     * Sources:
+     * http://www.house6.com/blog/?p=83
+     * and
+     * http://stackoverflow.com/a/24984010
      *
      * @param string $f
+     * @param string $type
      *
      * @return string
      */
-    public function sanitize($f, $type = 'file')
+    public static function sanitize($f, $type = 'file')
     {
-        /*  A combination of various methods to sanitize a string while retaining
-        the "essence" of the original file name as much as possible.
-        Note: unsuitable for file paths as '/' and '\' are filtered out.
-        Sources:
-        http://www.house6.com/blog/?p=83
-        and
-        http://stackoverflow.com/a/24984010
-         */
         $replace_chars = array(
             '&amp;' => '-and-', '@' => '-at-', '©' => 'c', '®' => 'r', 'À' => 'a',
             'Á' => 'a', 'Â' => 'a', 'Ä' => 'a', 'Å' => 'a', 'Æ' => 'ae', 'Ç' => 'c',
@@ -938,14 +939,16 @@ class AddPageByFormPlugin extends Plugin
             'נ' => 'n', 'ס' => 's', 'ע' => 'e', 'ף' => 'p', 'פ' => 'p', 'ץ' => 'C',
             'צ' => 'c', 'ק' => 'q', 'ר' => 'r', 'ש' => 'w', 'ת' => 't', '™' => 'tm',
             'Ã' => 'A', 'Ð' => 'Dj', 'Ê' => 'E', 'Ñ' => 'N', 'Þ' => 'B', 'ã' => 'a',
-            'ð' => 'o', 'ñ' => 'n', '#' => '-nr-');
+            'ð' => 'o', 'ñ' => 'n', '#' => '-nr-'
+        );
         // "Translate" multi byte characters to 'corresponding' ASCII characters
         $f = strtr($f, $replace_chars);
         // Convert special characters to a hyphen
         $f = str_replace(array(
             ' ', '!', '\\', '/', '\'', '`', '"', '~', '%', '|',
             '*', '$', '^', '(', ')', '[', ']', '{', '}',
-            '+', ',', ':', ';', '<', '=', '>', '?', '|'), '-', $f);
+            '+', ',', ':', ';', '<', '=', '>', '?', '|'
+        ), '-', $f);
         // Remove any non ASCII characters
         $f = preg_replace('/[^(\x20-\x7F)]*/', '', $f);
         if ($type == 'file') {
@@ -965,5 +968,4 @@ class AddPageByFormPlugin extends Plugin
         $f = strtolower($f);
         return $f;
     }
-
 }
