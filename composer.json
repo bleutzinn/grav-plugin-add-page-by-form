@@ -1,0 +1,35 @@
+{
+    "name": "bleutzinn/grav-plugin-add-page-by-form",
+    "type": "grav-plugin",
+    "description": "Adds a page by means of a form",
+    "keywords": ["grav", "plugin", "page", "form", "frontmatter"],
+    "homepage": "https://github.com/bleutzinn/grav-plugin-add-page-by-form",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ron Wardenier",
+            "email": "bleutzinn@rwgc.nl",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues",
+        "docs": "https://github.com/bleutzinn/grav-plugin-add-page-by-form/blob/master/README.md"
+    },
+    "require": {
+        "php": ">=7.1.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Grav\\Plugin\\AddPageByFormPlugin\\": "classes/"
+        },
+        "classmap":  [
+            "add-page-by-form.php"
+        ]
+    },
+    "config": {
+        "platform": {
+            "php": "7.1.3"
+        }
+    }
+}
