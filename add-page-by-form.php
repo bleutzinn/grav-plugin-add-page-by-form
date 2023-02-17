@@ -2,13 +2,12 @@
 
 namespace Grav\Plugin;
 
+use Composer\Autoload\ClassLoader;
 use Grav\Common\Filesystem\Folder;
-use Grav\Common\Form\FormFlash;
 use Grav\Common\Grav;
 use Grav\Common\Page\Page;
 use Grav\Common\Plugin;
 use RocketTheme\Toolbox\Event\Event;
-use RocketTheme\Toolbox\File\File;
 use RocketTheme\Toolbox\File\YamlFile;
 use Symfony\Component\Yaml\Yaml;
 
@@ -20,13 +19,21 @@ class AddPageByFormPlugin extends Plugin
 {
 
     private $new_page_route = '';
-    private $move_self_files = false;
     private $say_my_name = ['addpage', 'add_page'];
-    private $uploads = array();
     private $page_frontmatter = array();
 
     protected $post = array();
 
+    /**
+     * Composer autoload.
+     *
+     * @return \Composer\Autoload\ClassLoader
+     */
+    public function autoload(): \Composer\Autoload\ClassLoader
+    {
+        return require __DIR__ . '/vendor/autoload.php';
+    }
+    
     /**
      * Extends a path
      *
@@ -342,7 +349,6 @@ class AddPageByFormPlugin extends Plugin
                     $pages = $this->grav['pages'];
                     $page = $this->grav['page'];
                     $header = $page->header();
-                    $form_page_relative_page_path = $page->relativePagePath();
 
                     // Get default settings form plugin config
                     $include_username = $this->config->get('plugins.add-page-by-form.include_username');
@@ -439,6 +445,11 @@ class AddPageByFormPlugin extends Plugin
                             unset($form_data['taxonomy']);
                         }
 
+                        if (isset($form_data['content'])) {
+                            $form_data['form_content'] = $form_data['content'];
+                            unset($form_data['content']);
+                        }
+
                         // Merge variables from pagefrontmatter block and form fields;
                         // Values that have been through a Twig Processor are in the
                         // page_frontmatter and take precedence over the form values
@@ -453,8 +464,8 @@ class AddPageByFormPlugin extends Plugin
                     */
 
                     // If content is not included as a form value then fallback to config default
-                    if (isset($page_frontmatter['content'])) {
-                        $content = $page_frontmatter['content'];
+                    if (isset($page_frontmatter['form_content'])) {
+                        $content = $page_frontmatter['form_content'];
                     } else {
                         $content = $this->config->get('plugins.add-page-by-form.default_content');
                     }
@@ -469,10 +480,25 @@ class AddPageByFormPlugin extends Plugin
                     }
 
                     // Remove unwanted items from new page frontmatter
-                    unset($page_frontmatter['_json']);
-                    unset($page_frontmatter['content']);
-                    unset($page_frontmatter['parent']);
-                    unset($page_frontmatter['subroute']);
+                    if (isset($page_frontmatter['_json'])) {
+                        unset($page_frontmatter['_json']);
+                    };
+                    
+                    if (isset($page_frontmatter['form_content'])) {
+                        unset($page_frontmatter['form_content']);
+                    };
+                    
+                    if (isset($page_frontmatter['parent'])) {
+                        unset($page_frontmatter['parent']);
+                    };
+
+                    if (isset($page_frontmatter['subroute'])) {
+                        unset($page_frontmatter['subroute']);
+                    };
+
+                    if (isset($page_frontmatter['honeypot'])) {
+                        unset($page_frontmatter['honeypot']);
+                    };
 
                     // Initialize default page parent
                     if (isset($header->parent)) {
@@ -604,16 +630,24 @@ class AddPageByFormPlugin extends Plugin
                             $new_page_name = $page_template . $extension;
                         }
 
-                        $path = $parent_page_path . DS . $slug . DS . $new_page_name;
-                        $route = $parent_page_route . DS . $slug;
+                        // Set the new page route taking the settings about the home page into account
+                        if ($parent_page_route == DS) {
+                            if ($this->config->get('system.home.hide_in_urls')) {
+                                $route = DS . $slug;
+                            } else {
+                                $route = $this->grav['pages']->getHomeRoute() . DS . $slug;
+                            }
+                        } else {
+                            $route = $parent_page_route . DS . $slug;
+                        }
 
                         // Set page location vars
                         $new_page->name($new_page_name);
                         $new_page->folder($slug);
-                        //$new_page->path($path);
+                        $new_page->path($parent_page_path . DS . $slug);
                         $new_page->extension($extension);
                         $new_page->parent($parent_page);
-                        $new_page->filePath($path);
+                        $new_page->filePath($parent_page_path . DS . $slug . DS . $new_page_name);
                         $new_page->routable(true);
 
                         // Add frontmatter vars
