@@ -1,3 +1,13 @@
+# v3.2.0
+##  02/17/2023
+
+1. [](#bugfix)
+   - Fixed a problem when `pagefrontmatter.content` was set (issue [#63](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues/63))
+1. [](#bugfix)
+   - Fixed incorrect handling of using `pageconfig.parent: /` (issue [#59](https://github.com/bleutzinn/grav-plugin-add-page-by-form/issues/59))
+1. [](#improved)
+   - Added composer
+
 # v3.1.0
 ##  12/13/2022
 
