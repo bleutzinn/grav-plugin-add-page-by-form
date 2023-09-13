@@ -562,7 +562,24 @@ class AddPageByFormPlugin extends Plugin
                         }
                         // Create a slug to be used as the page name (used publicly in URLs etc.)
                         if ($slug_field != '') {
-                            if (isset($page_frontmatter[$slug_field])) {
+                            // check if slug_field is comma separate list
+                            if (strpos($slug_field, ',') !== false) {
+                                $slug_field_array = explode(',', $slug_field);
+                                // make sure all slug elements are set
+                                $slugs_set = [];
+                                foreach($slug_field_array as $sf) {
+                                    $slugs_set[] = isset($page_frontmatter[trim($sf)]);
+                                }
+                                // if slug elements are set, build array of values
+                                if ( !empty($slugs_set) && !!array_product($slugs_set)) {
+                                    $slug_elems = [];
+                                    foreach($slug_field_array as $sf) {
+                                        $slug_elems[] = self::slug($page_frontmatter[trim($sf)]);
+                                    }
+                                    $slug = implode('-', $slug_elems);
+                                }
+                            // else if slug_field is single entry, use that
+                            } elseif (isset($page_frontmatter[$slug_field])) { 
                                 $slug = self::slug($page_frontmatter[$slug_field]);
                             }
                         }
