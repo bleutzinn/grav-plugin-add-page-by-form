@@ -33,7 +33,7 @@ class AddPageByFormPlugin extends Plugin
     {
         return require __DIR__ . '/vendor/autoload.php';
     }
-    
+
     /**
      * Extends a path
      *
@@ -386,7 +386,12 @@ class AddPageByFormPlugin extends Plugin
                             $overwrite_mode = $this->getTriStateConfig($pageconfig['overwrite_mode'], 'edit');
                         }
                         if (isset($pageconfig['slug_field'])) {
-                            $slug_field = strtolower(trim($pageconfig['slug_field']));
+                            // Convert array to comma separated string if needed
+                            $slug_field = $pageconfig['slug_field'];
+                            if (is_array($slug_field)) {
+                                $slug_field = implode(',', $slug_field);
+                            }
+                            $slug_field = strtolower(trim($slug_field));
                         }
                         if (isset($pageconfig['physical_template_name'])) {
                             $physical_template_name = in_array(strtolower(trim($pageconfig['physical_template_name'])), $positives);
@@ -483,11 +488,11 @@ class AddPageByFormPlugin extends Plugin
                     if (isset($page_frontmatter['_json'])) {
                         unset($page_frontmatter['_json']);
                     };
-                    
+
                     if (isset($page_frontmatter['form_content'])) {
                         unset($page_frontmatter['form_content']);
                     };
-                    
+
                     if (isset($page_frontmatter['parent'])) {
                         unset($page_frontmatter['parent']);
                     };
@@ -561,25 +566,28 @@ class AddPageByFormPlugin extends Plugin
                             $parent_page_path = $parent_destination['path'];
                         }
                         // Create a slug to be used as the page name (used publicly in URLs etc.)
+                        /*
+                        Check $slug_field type
+                        */
                         if ($slug_field != '') {
                             // check if slug_field is comma separate list
                             if (strpos($slug_field, ',') !== false) {
                                 $slug_field_array = explode(',', $slug_field);
                                 // make sure all slug elements are set
                                 $slugs_set = [];
-                                foreach($slug_field_array as $sf) {
+                                foreach ($slug_field_array as $sf) {
                                     $slugs_set[] = isset($page_frontmatter[trim($sf)]);
                                 }
                                 // if slug elements are set, build array of values
-                                if ( !empty($slugs_set) && !!array_product($slugs_set)) {
+                                if (!empty($slugs_set) && !!array_product($slugs_set)) {
                                     $slug_elems = [];
-                                    foreach($slug_field_array as $sf) {
+                                    foreach ($slug_field_array as $sf) {
                                         $slug_elems[] = self::slug($page_frontmatter[trim($sf)]);
                                     }
                                     $slug = implode('-', $slug_elems);
                                 }
-                            // else if slug_field is single entry, use that
-                            } elseif (isset($page_frontmatter[$slug_field])) { 
+                                // else if slug_field is single entry, use that
+                            } elseif (isset($page_frontmatter[$slug_field])) {
                                 $slug = self::slug($page_frontmatter[$slug_field]);
                             }
                         }
