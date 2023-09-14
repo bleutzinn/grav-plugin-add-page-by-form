@@ -1,3 +1,9 @@
+# v3.3.0
+##  09/14/2023
+
+1. [](#improved)
+   - Added support multiple slug_fields to form unique slug, either as comma separated list or as array. Many thanks to walkload for the [pull request](https://github.com/bleutzinn/grav-plugin-add-page-by-form/pull/65)
+   
 # v3.2.0
 ##  02/17/2023
 
