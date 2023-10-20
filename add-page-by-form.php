@@ -842,7 +842,7 @@ class AddPageByFormPlugin extends Plugin
             // Only act upon forms which are intended to be processed by this plugin
             if (
                 isset($data['form']) && isset($data['form']['name']) &&
-                in_array(strtolower(substr($data['form']['name'], 0, 7)), $this->say_my_name)
+                in_array(strtolower(explode('.', $data['form']['name'])[0]), $this->say_my_name)
             ) {
 
                 if ($this->config->get('plugins.add-page-by-form.use_editor_class', true)) {
