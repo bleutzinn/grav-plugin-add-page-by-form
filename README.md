@@ -1,5 +1,7 @@
 # Add Page By Form Plugin
 
+***Abandonment Notice:** Creating and improving my plugins for Grav was fun to do, however times are changing and so am I. My interests have shifted away from coding and so I am abandoning my plugins. If you are interested in taking over please follow the ["Abandoned Resource Protocol"](https://learn.getgrav.org/advanced/grav-development#abandoned-resource-protocol). Simply skip the first two steps and refer to this statement in step 3.*
+
 The **Add Page By Form** Plugin is for [Grav CMS](http://github.com/getgrav/grav). It allows users to add a new page by filling in a form.
 
 This plugin uses the possibilities of [custom frontmatter](https://learn.getgrav.org/content/headers#custom-page-headers). By setting your own variables in the form page frontmatter a priori and optionally letting users override these variable values by filling in corresponding form fields you can transport these data into the new page frontmatter.
